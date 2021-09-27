@@ -26,8 +26,8 @@ void StandardMaterial::setUniforms(Camera* camera, Matrix44 model)
 	shader->setUniform("u_color", color);
 	shader->setUniform("u_exposure", Application::instance->scene_exposure);
 
-	if (texture)
-		shader->setUniform("u_texture", texture);
+	if (this->texture)
+		shader->setUniform("u_texture", this->texture);
 }
 
 void StandardMaterial::render(Mesh* mesh, Matrix44 model, Camera* camera)
