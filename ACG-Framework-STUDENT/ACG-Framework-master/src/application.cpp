@@ -11,7 +11,6 @@
 #include "extra/imgui/imgui.h"
 #include "extra/imgui/imgui_impl_sdl.h"
 #include "extra/imgui/imgui_impl_opengl3.h"
-
 #include <cmath>
 
 bool render_wireframe = false;
@@ -55,6 +54,8 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 		mat->shader = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");
 		node_list.push_back(node);
 	}
+	ambient = Vector3(0.2,0.2,0.2); 
+	directional = new Light(); 
 	
 	//hide the cursor
 	SDL_ShowCursor(!mouse_locked); //hide or show the mouse
@@ -71,6 +72,7 @@ void Application::render(void)
 
 	//set the camera as default
 	camera->enable();
+	std::cout << camera->eye.x << " " << camera->eye.y << " " << camera->eye.z << " \n";
 
 	//set flags
 	glEnable(GL_DEPTH_TEST);

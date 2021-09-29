@@ -106,7 +106,7 @@
     <ClCompile Include="..\..\src\extra\pvmparser.cpp">
       <Filter>extra</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\light.cpp" />
+    <ClCompile Include="..\..\src\Light.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\camera.h" />
@@ -213,7 +213,7 @@
     <ClInclude Include="..\..\src\extra\directory_watcher.h">
       <Filter>extra</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\light.h" />
+    <ClInclude Include="..\..\src\Light.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="extra">

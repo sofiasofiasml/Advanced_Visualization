@@ -9,6 +9,7 @@
 #include "camera.h"
 #include "utils.h"
 #include "scenenode.h"
+#include "Light.h"
 
 enum EOutput {
 	COMPLETE,
@@ -44,6 +45,10 @@ public:
 	static Camera* camera; //our GLOBAL camera
 	bool mouse_locked; //tells if the mouse is locked (not seen)
 
+	//Light
+	Vector3 ambient; 
+	Light* directional; 
+	
 	Application( int window_width, int window_height, SDL_Window* window );
 
 	//main functions
