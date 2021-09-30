@@ -46,10 +46,10 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 	{
 		StandardMaterial* mat = new StandardMaterial();
 		SceneNode* node = new SceneNode("Visible node");
-		node->mesh = Mesh::Get("data/meshes/sphere.obj.mbin");
+		node->mesh = Mesh::Get("data/meshes/car.obj.mbin");
 		//node->model.scale(5, 5, 5);
 		node->material = mat;
-		node->material->texture = Texture::Get("data/textures/stone.tga");
+		node->material->texture = Texture::Get("data/textures/car/BaseColor.tga");
 
 		mat->shader = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");
 		node_list.push_back(node);
@@ -72,7 +72,7 @@ void Application::render(void)
 
 	//set the camera as default
 	camera->enable();
-	std::cout << camera->eye.x << " " << camera->eye.y << " " << camera->eye.z << " \n";
+	//std::cout << camera->eye.x << " " << camera->eye.y << " " << camera->eye.z << " \n";
 
 	//set flags
 	glEnable(GL_DEPTH_TEST);
