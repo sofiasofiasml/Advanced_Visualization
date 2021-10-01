@@ -5,8 +5,10 @@
 #define LIGHT_H
 
 #include "framework.h"
+#include "scenenode.h"
 
-class Light
+
+class Light : public SceneNode
 {
 public: 
 	Vector3 color;

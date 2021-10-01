@@ -107,6 +107,7 @@
       <Filter>extra</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Light.cpp" />
+    <ClCompile Include="..\..\src\Skybox.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\camera.h" />
@@ -214,6 +215,7 @@
       <Filter>extra</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\Light.h" />
+    <ClInclude Include="..\..\src\Skybox.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="extra">
