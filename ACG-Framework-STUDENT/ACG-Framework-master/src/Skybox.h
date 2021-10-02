@@ -7,8 +7,8 @@
 class YourSkybox : public SceneNode
 {
 public:
-	Texture* tex_skybox;
 	Mesh* mesh;
+	Texture* tex_skybox; 
 	void renderSkybox();
 	void loadCubemap();
 

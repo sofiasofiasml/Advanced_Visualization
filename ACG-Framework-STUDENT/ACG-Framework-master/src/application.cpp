@@ -52,11 +52,27 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 		node->material->texture = Texture::Get("data/textures/stone.tga");
 
 		mat->shader = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");
+		node->model.translate(0, 1, 0); 
 		node_list.push_back(node);
+		
+		StandardMaterial* mat2 = new StandardMaterial();
+		SceneNode* ground = new SceneNode("Visible node");
+		ground->mesh = new Mesh(); 
+		ground->mesh->createPlane(100);
+		//node->model.scale(20, 20, 20);
+		ground->material = mat2;
+		ground->material->texture = Texture::Get("data/textures/ground.tga");
+
+		mat2->shader = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");
+		node_list.push_back(ground);
 	}
-	ambient = Vector3(0.2,0.2,0.2); 
-	directional = new Light(); 
-	
+	{
+		ambient = Vector3(0.2, 0.2, 0.2);
+		directional = new Light();
+	}
+
+
+	skybox = new YourSkybox(); 
 	//hide the cursor
 	SDL_ShowCursor(!mouse_locked); //hide or show the mouse
 }
@@ -69,9 +85,16 @@ void Application::render(void)
 
 	// Clear the window and the depth buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 	//set the camera as default
 	camera->enable();
+	
+	//Skybox
+	Matrix44 skybox_model; 
+	skybox_model.translate(camera->eye.x, camera->eye.y, camera->eye.z);
+	glDisable(GL_DEPTH_TEST); 
+	skybox->material->render(skybox->mesh, skybox_model, camera); 
+	glEnable(GL_DEPTH_TEST); 
+
 	//std::cout << camera->eye.x << " " << camera->eye.y << " " << camera->eye.z << " \n";
 
 	//set flags
