@@ -5,11 +5,12 @@
 YourSkybox::YourSkybox()
 {
 	StandardMaterial* mat = new StandardMaterial();
-	this->mesh = Mesh::Get("data/meshes/sphere.obj");
+	this->mesh = new Mesh();
+	this->mesh->createCube();
 	this->material = mat; 
-	this->material->texture = Texture::Get("data/textures/cielo.tga");
-	//this->material->texture->cubemapFromImages("data/environments/city");
-	this->material->shader = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");
+	loadCubemap();
+	this->material->shader = Shader::Get("data/shaders/basic.vs", "data/shaders/skybox.fs");
+	
 }
 void YourSkybox::renderSkybox()
 {
@@ -17,6 +18,9 @@ void YourSkybox::renderSkybox()
 
 void YourSkybox::loadCubemap()
 {
+	this->material->texture = new Texture();
+	this->material->texture->cubemapFromImages("data/environments/city");
+
 }
 
 
