@@ -17,25 +17,19 @@ void main()
 {
 	vec2 uv = v_uv;
 	/*PHONG*/
-	//vec3 N = v_normal; 
-	//vec3 L = u_light_dir; 
+	vec3 N = v_normal; 
+	vec3 L = u_light_dir; 
 	/* Diffuse*/
-	//float diff = max(dot(N, L), 0.0); 
-	//vec3 diffuse = diff * u_light_color; 
+	float diff = max(dot(N, L), 0.0); 
+	vec3 diffuse = diff * u_light_color; 
 	/*Specular*/
-	//vec3 V = normalize(u_camera_pos -v_world_position); 
-	//vec3 R = reflect(L, N); 
-	//float spec = pow(max(dot(V,R),0.0),2); 
-	//vec3 specular = spec* u_light_color; 
+	vec3 V = normalize(u_camera_pos -v_world_position); 
+	vec3 R = reflect(L, N); 
+	float spec = pow(max(dot(V,R),0.0),2); 
+	vec3 specular = spec* u_light_color; 
 
-	//light =  u_ambient+ specular +diffuse;
-
-	//color =  vec4(light,1.0)* textureCube(u_texture,V); 
-	//gl_FragColor = color;
-
-	//simple way
-	vec3 V = normalize(u_camera_pos -v_world_position);
-	color =  textureCube(u_texture,V);//*0.2; 
+	light =  u_ambient+ specular +diffuse;
+	color = vec4(light,1.0)* textureCube(u_texture,vec3(uv,1.0f));
 	gl_FragColor = color;
 
 }

@@ -19,7 +19,7 @@ void YourSkybox::renderSkybox()
 void YourSkybox::loadCubemap()
 {
 	this->material->texture = new Texture();
-	this->material->texture->cubemapFromImages("data/environments/city");
+	this->material->texture->cubemapFromImages("data/environments/snow");
 
 }
 
