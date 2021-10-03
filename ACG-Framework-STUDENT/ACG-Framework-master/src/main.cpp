@@ -110,6 +110,11 @@ void renderGUI(SDL_Window* window, Application * game)
 			ImGui::TreePop();
 		}
 
+		if (ImGui::TreeNode("Light")) {
+			game->directional->renderInMenu();
+			ImGui::TreePop();
+		}
+
 		//Scene graph
 		if (ImGui::TreeNode("Entities"))
 		{

@@ -54,17 +54,6 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 		mat->shader = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");
 		node->model.translate(0, 1, 0); 
 		node_list.push_back(node);
-		
-		//StandardMaterial* mat2 = new StandardMaterial();
-		//SceneNode* ground = new SceneNode("Visible node");
-		//ground->mesh = new Mesh(); 
-		//ground->mesh->createPlane(100);
-		////node->model.scale(20, 20, 20);
-		//ground->material = mat2;
-		//ground->material->texture = Texture::Get("data/textures/ground.tga");
-
-		//mat2->shader = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");
-		//node_list.push_back(ground);
 	}
 	{
 		ambient = Vector3(0.2, 0.2, 0.2);
@@ -108,6 +97,7 @@ void Application::render(void)
 			node_list[i]->renderWireframe(camera);
 	}
 
+	//Light
 	//Draw the floor grid
 	/*if(render_debug)
 		drawGrid();*/

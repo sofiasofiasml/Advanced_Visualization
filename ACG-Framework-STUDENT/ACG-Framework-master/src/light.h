@@ -17,7 +17,7 @@ public:
 	Vector3 position;
 
 	Light();
-
+	void renderInMenu(); 
 };
 
 #endif
