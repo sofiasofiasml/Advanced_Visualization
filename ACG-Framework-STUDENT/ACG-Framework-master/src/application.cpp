@@ -49,7 +49,7 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 		node->mesh = Mesh::Get("data/meshes/sphere.obj");
 		//node->model.scale(20, 20, 20);
 		node->material = mat;
-		node->material->texture = Texture::Get("data/textures/stone.tga");
+		//node->material->texture = Texture::Get("data/textures/stone.tga");
 
 		mat->shader = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");
 		node->model.translate(0, 1, 0); 

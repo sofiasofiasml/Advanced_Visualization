@@ -32,9 +32,9 @@ void StandardMaterial::setUniforms(Camera* camera, Matrix44 model)
 	shader->setUniform("u_light_color", light_dir->color);
 	shader->setUniform("u_light_dir", light_dir->direction);
 	shader->setUniform("u_light_pos", light_dir->position);
-
+	
 	if (this->texture)
-		shader->setUniform("u_texture", this->texture);
+		shader->setUniform("u_texture", this->texture,0);
 }
 
 void StandardMaterial::render(Mesh* mesh, Matrix44 model, Camera* camera)
