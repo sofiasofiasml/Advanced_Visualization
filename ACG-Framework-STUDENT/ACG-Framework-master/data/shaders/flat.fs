@@ -19,7 +19,7 @@ void main()
 	vec2 uv = v_uv;
 	/*PHONG*/
 	vec3 N = v_normal; 
-	vec3 L = u_light_dir; 
+	vec3 L = u_light_dir; //normalize(v_position-u_camera_pos); 
 	/* Diffuse*/
 	float diff = max(dot(N, L), 0.0); 
 	vec3 diffuse = diff * u_light_color; 
@@ -31,7 +31,7 @@ void main()
 
 	light =  u_ambient+ specular +diffuse;
 	//color =  vec4(light,1.0)* texture2D(u_texture, uv ); if we want another texture not the reflect
-	color =  vec4(light,1.0)* vec4(textureCube(u_skybox,v_position ).rgb,1.0); 
+	color =  vec4(light,1.0)* vec4(textureCube(u_skybox,R ).rgb,1.0); 
 	
 	gl_FragColor = color;
 
