@@ -1,6 +1,7 @@
 varying vec2 v_uv;
 varying vec3 v_normal;
 varying vec3 v_world_position;
+varying vec3 v_position;
 
 uniform vec4 u_color;
 uniform samplerCube u_texture;
@@ -29,7 +30,7 @@ void main()
 	vec3 specular = spec* u_light_color; 
 
 	light =  u_ambient+ specular +diffuse;
-	color = vec4(light,1.0)* textureCube(u_texture,vec3(uv,1.0f));
+	color = vec4(light,1.0)* textureCube(u_texture,v_position);
 	gl_FragColor = color;
 
 }

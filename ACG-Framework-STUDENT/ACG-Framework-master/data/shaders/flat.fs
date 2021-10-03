@@ -1,6 +1,7 @@
 varying vec2 v_uv;
 varying vec3 v_normal;
 varying vec3 v_world_position;
+varying vec3 v_position;
 
 uniform vec4 u_color;
 //uniform sampler2D u_texture;
@@ -30,7 +31,7 @@ void main()
 
 	light =  u_ambient+ specular +diffuse;
 	//color =  vec4(light,1.0)* texture2D(u_texture, uv ); if we want another texture not the reflect
-	color =  vec4(light,1.0)* vec4(textureCube(u_skybox,R ).rgb,1.0); 
+	color =  vec4(light,1.0)* vec4(textureCube(u_skybox,v_position ).rgb,1.0); 
 	
 	gl_FragColor = color;
 
