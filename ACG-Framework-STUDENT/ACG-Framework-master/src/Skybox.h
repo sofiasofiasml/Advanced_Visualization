@@ -9,8 +9,10 @@ class YourSkybox : public SceneNode
 public:
 	Mesh* mesh;
 	Texture* tex_skybox; 
-	void renderSkybox();
+	int now_sky;
+	int before_sky;
 	void loadCubemap();
 
 	YourSkybox(); 
+	void renderInMenu(); 
 };

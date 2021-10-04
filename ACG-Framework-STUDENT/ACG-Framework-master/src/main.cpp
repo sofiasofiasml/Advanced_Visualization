@@ -114,7 +114,10 @@ void renderGUI(SDL_Window* window, Application * game)
 			game->directional->renderInMenu();
 			ImGui::TreePop();
 		}
-
+		if (ImGui::TreeNode("Skybox")) {
+			game->skybox->renderInMenu();
+			ImGui::TreePop();
+		}
 		//Scene graph
 		if (ImGui::TreeNode("Entities"))
 		{

@@ -83,7 +83,8 @@ void Application::render(void)
 	glDisable(GL_DEPTH_TEST); 
 	skybox->material->render(skybox->mesh, skybox_model, camera); 
 	glEnable(GL_DEPTH_TEST); 
-
+	if(skybox->now_sky != skybox->before_sky)
+		skybox->loadCubemap();
 	//std::cout << camera->eye.x << " " << camera->eye.y << " " << camera->eye.z << " \n";
 
 	//set flags
