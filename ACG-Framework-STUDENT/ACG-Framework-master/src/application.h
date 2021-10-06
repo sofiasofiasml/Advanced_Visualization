@@ -11,6 +11,7 @@
 #include "scenenode.h"
 #include "Light.h"
 #include "Skybox.h"
+#include "yourmaterial.h"
 
 enum EOutput {
 	COMPLETE,
@@ -49,7 +50,7 @@ public:
 	//Light
 	Vector3 ambient; 
 	Light* directional; 
-	
+	yourmaterial* material_basic;
 	//Skybox
 	YourSkybox* skybox; 
 	Application( int window_width, int window_height, SDL_Window* window );

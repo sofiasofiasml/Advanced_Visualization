@@ -49,9 +49,9 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 		node->mesh = Mesh::Get("data/meshes/sphere.obj");
 		//node->model.scale(20, 20, 20);
 		node->material = mat;
-		//node->material->texture = Texture::Get("data/textures/stone.tga");
 
-		mat->shader = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");
+		node->material->texture = Texture::Get("data/textures/stone.tga");
+		//mat->shader = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");
 		node->model.translate(0, 1, 0); 
 		node_list.push_back(node);
 	}
@@ -60,7 +60,7 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 		directional = new Light();
 	}
 
-
+	material_basic = new yourmaterial();
 	skybox = new YourSkybox(); 
 	//hide the cursor
 	SDL_ShowCursor(!mouse_locked); //hide or show the mouse
@@ -92,6 +92,14 @@ void Application::render(void)
 	glDisable(GL_CULL_FACE);
 
 	for (size_t i = 0; i < node_list.size(); i++) {
+		if (material_basic->material == material_basic->TEXTURE)
+			node_list[i]->material->shader = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");
+		else if (material_basic->material == material_basic->PHONG)
+			node_list[i]->material->shader = Shader::Get("data/shaders/basic.vs", "data/shaders/phong.fs");
+		if (material_basic->material == material_basic->REFLECTIVE)
+			node_list[i]->material->shader = Shader::Get("data/shaders/basic.vs", "data/shaders/reflective.fs");
+		if (material_basic->material == material_basic->REFRACTION)
+			node_list[i]->material->shader = Shader::Get("data/shaders/basic.vs", "data/shaders/refractive.fs");
 		node_list[i]->render(camera);
 
 		if(render_wireframe)

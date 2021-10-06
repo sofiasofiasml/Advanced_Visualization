@@ -108,6 +108,7 @@
     </ClCompile>
     <ClCompile Include="..\..\src\Light.cpp" />
     <ClCompile Include="..\..\src\Skybox.cpp" />
+    <ClCompile Include="..\..\src\Yourmaterial.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\camera.h" />
@@ -216,6 +217,7 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Light.h" />
     <ClInclude Include="..\..\src\Skybox.h" />
+    <ClInclude Include="..\..\src\Yourmaterial.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="extra">

@@ -109,7 +109,10 @@ void renderGUI(SDL_Window* window, Application * game)
 			game->camera->renderInMenu();
 			ImGui::TreePop();
 		}
-
+		if (ImGui::TreeNode("Material")) {
+			game->material_basic->renderInMenu();
+			ImGui::TreePop();
+		}
 		if (ImGui::TreeNode("Light")) {
 			game->directional->renderInMenu();
 			ImGui::TreePop();
