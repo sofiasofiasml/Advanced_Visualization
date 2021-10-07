@@ -6,6 +6,7 @@ varying vec3 v_position;
 uniform vec4 u_color;
 uniform vec3 u_ambient;
 uniform float u_light_intensity;
+uniform float u_alpha;
 uniform vec3 u_light_color;
 uniform vec3 u_light_dir;
 uniform vec3 u_light_pos;
@@ -25,7 +26,7 @@ void main()
 	/*Specular*/
 	vec3 V = normalize(u_camera_position -v_world_position); 
 	vec3 R = reflect(-L, N); 
-	float spec = pow(max(dot(V,R),0.0),2); 
+	float spec = pow(max(dot(V,R),0.0),u_alpha); 
 	vec3 specular = spec* u_light_color; 
 
 	

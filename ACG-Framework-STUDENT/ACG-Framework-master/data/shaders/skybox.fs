@@ -30,7 +30,7 @@ void main()
 	vec3 specular = spec* u_light_color; 
 
 	light =  u_ambient+ specular +diffuse;
-	color =  textureCube(u_texture,v_position);
+	color =  textureCube(u_texture,-V);
 	gl_FragColor = color;
 
 }

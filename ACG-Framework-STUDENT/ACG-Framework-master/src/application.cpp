@@ -54,7 +54,10 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 		//node->model.scale(20, 20, 20);
 		node->material = mat;
 
-		node->material->texture = Texture::Get("data/textures/stone.tga");
+		material_basic->text_ground = Texture::Get("data/textures/ground.tga");
+		material_basic->text_stone = Texture::Get("data/textures/stone.tga");
+		node->material->texture = material_basic->text_stone;
+
 		material_basic->shader_flat = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");
 		material_basic->shader_phong = Shader::Get("data/shaders/basic.vs", "data/shaders/phong.fs");
 		material_basic->shader_reflective = Shader::Get("data/shaders/basic.vs", "data/shaders/reflective.fs");
@@ -64,7 +67,6 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 		node_list.push_back(node);
 	}
 	{
-		ambient = Vector3(0.2, 0.2, 0.2);
 		directional = new Light();
 	}
 
@@ -93,7 +95,6 @@ void Application::render(void)
 	glEnable(GL_DEPTH_TEST); 
 	if(skybox->now_sky != skybox->before_sky)
 		skybox->loadCubemap();
-	//std::cout << camera->eye.x << " " << camera->eye.y << " " << camera->eye.z << " \n";
 
 	//set flags
 	glEnable(GL_DEPTH_TEST);
@@ -119,13 +120,12 @@ void Application::render(void)
 			node_list[i]->mesh = material_basic->meshHelmet;
 		else if (node_list[i]->mesh_selected == 2)
 			node_list[i]->mesh = material_basic->meshBench;
-		
+		if (material_basic->eTexture == 0)
+			node_list[i]->material->texture = material_basic->text_stone; 
+		else if (material_basic->eTexture ==1)
+			node_list[i]->material->texture = material_basic->text_ground;
 	}
 	
-	//Light
-	//Draw the floor grid
-	/*if(render_debug)
-		drawGrid();*/
 }
 
 void Application::update(double seconds_elapsed)

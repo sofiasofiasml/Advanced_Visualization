@@ -15,6 +15,8 @@ public:
 	float intensity;
 	Vector3 direction;
 	Vector3 position;
+	Vector3 ambient;
+	float alpha;
 
 	Light();
 	void renderInMenu(); 

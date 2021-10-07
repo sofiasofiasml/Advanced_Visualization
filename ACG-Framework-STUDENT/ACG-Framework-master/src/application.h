@@ -48,7 +48,6 @@ public:
 	bool mouse_locked; //tells if the mouse is locked (not seen)
 
 	//Light
-	Vector3 ambient; 
 	Light* directional; 
 	yourmaterial* material_basic;
 	//Skybox
