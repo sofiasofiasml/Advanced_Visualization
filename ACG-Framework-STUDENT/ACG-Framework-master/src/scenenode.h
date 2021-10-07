@@ -25,6 +25,8 @@ public:
 	Mesh* mesh = NULL;
 	Matrix44 model;
 
+	unsigned int mesh_selected = 0;
+
 	virtual void render(Camera* camera);
 	virtual void renderWireframe(Camera* camera);
 	virtual void renderInMenu();

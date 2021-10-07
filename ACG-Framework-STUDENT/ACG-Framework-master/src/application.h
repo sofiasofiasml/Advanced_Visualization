@@ -53,6 +53,8 @@ public:
 	yourmaterial* material_basic;
 	//Skybox
 	YourSkybox* skybox; 
+
+
 	Application( int window_width, int window_height, SDL_Window* window );
 
 	//main functions
