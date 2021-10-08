@@ -7,8 +7,6 @@
 class YourSkybox : public SceneNode
 {
 public:
-	/*Mesh* mesh;
-	Texture* tex_skybox; */
 	int now_sky;
 	int before_sky;
 

@@ -23,6 +23,9 @@ public:
 	Shader* shader_reflective = NULL;
 	Shader* shader_refractive = NULL;
 
+	float u_active; 
+	bool active_bool; 
+
 	yourmaterial();
 	void renderInMenu();
 

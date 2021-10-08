@@ -12,6 +12,8 @@ uniform vec3 u_light_dir;
 uniform vec3 u_light_pos;
 uniform vec3 u_camera_position;
 uniform samplerCube u_skybox;
+uniform sampler2D u_texture;
+uniform float u_active; 
 vec4 color; 
 vec3 light; 
 void main()
@@ -31,7 +33,11 @@ void main()
 
 	
 	light =  u_ambient+ specular +diffuse;
-	color =   vec4(light,1.0)*u_light_intensity; 	
+	 	
+
+	if(u_active==0.0){color =   vec4(light,1.0)*u_light_intensity;}
+	else{color =  vec4(light,1.0)*u_light_intensity*texture2D(u_texture, uv );}
+	
 	gl_FragColor = color;
 
 }

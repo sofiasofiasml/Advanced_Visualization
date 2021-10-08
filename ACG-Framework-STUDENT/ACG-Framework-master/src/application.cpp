@@ -95,7 +95,7 @@ void Application::render(void)
 	glEnable(GL_DEPTH_TEST); 
 	if(skybox->now_sky != skybox->before_sky)
 		skybox->loadCubemap();
-
+	
 	//set flags
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
