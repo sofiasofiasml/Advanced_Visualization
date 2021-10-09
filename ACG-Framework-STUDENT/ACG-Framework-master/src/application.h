@@ -49,9 +49,11 @@ public:
 
 	//Light
 	Light* directional; 
-	yourmaterial* material_basic;
+
 	//Skybox
 	YourSkybox* skybox; 
+
+	yourmaterial* material_basic;
 
 
 	Application( int window_width, int window_height, SDL_Window* window );

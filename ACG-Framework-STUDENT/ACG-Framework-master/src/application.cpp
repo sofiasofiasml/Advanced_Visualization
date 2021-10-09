@@ -47,29 +47,30 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 	{
 		StandardMaterial* mat = new StandardMaterial();
 		SceneNode* node = new SceneNode("Visible node");
-		material_basic->meshSphere = Mesh::Get("data/meshes/sphere.obj");
-		node->mesh = material_basic->meshSphere;
-		material_basic->meshHelmet = Mesh::Get("data/models/helmet/helmet.obj");
-		material_basic->meshBench = Mesh::Get("data/models/bench/bench.obj");
-		//node->model.scale(20, 20, 20);
 		node->material = mat;
 
-		material_basic->text_ground = Texture::Get("data/textures/ground.tga");
-		material_basic->text_stone = Texture::Get("data/textures/stone.tga");
-		node->material->texture = material_basic->text_stone;
+		//Mesh
+		material_basic->meshSphere = Mesh::Get("data/meshes/sphere.obj");
+		material_basic->meshHelmet = Mesh::Get("data/models/helmet/helmet.obj");
+		material_basic->meshBench = Mesh::Get("data/models/bench/bench.obj");
 
+		//Textures
+		material_basic->text_helmet = Texture::Get("data/models/helmet/albedo.png");
+		material_basic->text_ball = Texture::Get("data/models/ball/albedo.png");
+		material_basic->text_bench = Texture::Get("data/models/bench/albedo.png");
+
+		//Shaders
 		material_basic->shader_flat = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");
 		material_basic->shader_phong = Shader::Get("data/shaders/basic.vs", "data/shaders/phong.fs");
 		material_basic->shader_reflective = Shader::Get("data/shaders/basic.vs", "data/shaders/reflective.fs");
-		material_basic->shader_refractive = Shader::Get("data/shaders/basic.vs", "data/shaders/refractive.fs");
-		//mat->shader = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");
+		
+		node->material->texture = material_basic->text_ball;
+		node->mesh = material_basic->meshHelmet;
 		node->model.translate(0, 1, 0); 
 		node_list.push_back(node);
 	}
-	{
-		directional = new Light();
-	}
-
+	
+	directional = new Light();
 	
 	skybox = new YourSkybox(); 
 	//hide the cursor
@@ -101,29 +102,32 @@ void Application::render(void)
 	glDisable(GL_CULL_FACE);
 
 	for (size_t i = 0; i < node_list.size(); i++) {
-		if (material_basic->material == material_basic->TEXTURE)
+		if (material_basic->eMaterial == material_basic->TEXTURE)
 			node_list[i]->material->shader = material_basic->shader_flat;
-		else if (material_basic->material == material_basic->PHONG)
+		else if (material_basic->eMaterial == material_basic->PHONG)
 			node_list[i]->material->shader = material_basic->shader_phong;
-		else if (material_basic->material == material_basic->REFLECTIVE)
+		else if (material_basic->eMaterial == material_basic->REFLECTIVE)
 			node_list[i]->material->shader = material_basic->shader_reflective;
-		else if (material_basic->material == material_basic->REFRACTION)
-			node_list[i]->material->shader = material_basic->shader_refractive;
 		node_list[i]->render(camera);
 
 		if(render_wireframe)
 			node_list[i]->renderWireframe(camera);
-		//mesh
+
+		//We change the mesh if we change the imGui options
 		if (node_list[i]->mesh_selected == 0)
-			node_list[i]->mesh = material_basic->meshSphere;
-		else if (node_list[i]->mesh_selected == 1)
 			node_list[i]->mesh = material_basic->meshHelmet;
+		else if (node_list[i]->mesh_selected == 1)
+			node_list[i]->mesh = material_basic->meshSphere;
 		else if (node_list[i]->mesh_selected == 2)
 			node_list[i]->mesh = material_basic->meshBench;
+
+		//We change the texture if we change the imGui options
 		if (material_basic->eTexture == 0)
-			node_list[i]->material->texture = material_basic->text_stone; 
-		else if (material_basic->eTexture ==1)
-			node_list[i]->material->texture = material_basic->text_ground;
+			node_list[i]->material->texture = material_basic->text_ball; 
+		else if (material_basic->eTexture == 1)
+			node_list[i]->material->texture = material_basic->text_helmet;
+		else if (material_basic->eTexture == 2)
+			node_list[i]->material->texture = material_basic->text_bench;
 	}
 	
 }

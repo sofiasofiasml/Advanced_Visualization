@@ -12,10 +12,10 @@ class Light : public SceneNode
 {
 public: 
 	Vector3 color;
-	float intensity;
 	Vector3 direction;
 	Vector3 position;
 	Vector3 ambient;
+	float intensity;
 	float alpha;
 
 	Light();

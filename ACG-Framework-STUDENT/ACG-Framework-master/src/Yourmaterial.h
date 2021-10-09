@@ -4,14 +4,17 @@
 class yourmaterial : public StandardMaterial
 {
 public:
-	enum shaders { TEXTURE, PHONG, REFLECTIVE, REFRACTION };
-	shaders material;
+	enum shaders { TEXTURE, PHONG, REFLECTIVE};
+	shaders eMaterial;
 
-	enum tex_material { STONE, GROUND }; 
+	enum tex_material {HELMET, BALL, BENCH}; 
 	tex_material eTexture; 
 	
-	Texture* text_ground = new Texture();
-	Texture* text_stone = new Texture();
+	//Textures
+	Texture* text_helmet = new Texture();
+	Texture* text_ball = new Texture();
+	Texture* text_bench = new Texture();
+
 	//Mesh
 	Mesh* meshHelmet = NULL;
 	Mesh* meshSphere = NULL;
@@ -21,8 +24,8 @@ public:
 	Shader* shader_flat = NULL;
 	Shader* shader_phong = NULL;
 	Shader* shader_reflective = NULL;
-	Shader* shader_refractive = NULL;
 
+	//Var for the imGui options
 	float u_active; 
 	bool active_bool; 
 
