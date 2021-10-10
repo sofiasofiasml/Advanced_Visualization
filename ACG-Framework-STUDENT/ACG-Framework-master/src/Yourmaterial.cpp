@@ -8,12 +8,16 @@ yourmaterial::yourmaterial()
 	eTexture = BALL; 
 	u_active = 0; 
 	active_bool = 0; 
+	this->tex_albedo = new Texture();
+	this->tex_normal = new Texture();
+	this->tex_metal = new Texture();
+	this->tex_rough = new Texture();
 }
 
 void yourmaterial::renderInMenu()
 {
 	//Im Gui
-	ImGui::Combo("Output", (int*)&Application::instance->material_basic->eMaterial, "TEXTURE\0PHONG\0REFLECTIVE\0");
+	ImGui::Combo("Output", (int*)&Application::instance->material_basic->eMaterial, "TEXTURE\0PHONG\0REFLECTIVE\0PBR\0");
 	ImGui::Combo("Texture", (int*)&Application::instance->material_basic->eTexture, "BALL\0HELMET\0BENCH\0");
 	if (eMaterial==PHONG)
 	{

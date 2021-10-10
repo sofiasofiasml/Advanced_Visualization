@@ -13,6 +13,7 @@
 #include "Skybox.h"
 #include "yourmaterial.h"
 
+
 enum EOutput {
 	COMPLETE,
 	ALBEDO,

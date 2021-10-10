@@ -18,6 +18,8 @@ void StandardMaterial::setUniforms(Camera* camera, Matrix44 model)
 {
 	Application* app = Application::instance; 
 	Light* light_dir = Application::instance->directional; 
+	yourmaterial* youMat = Application::instance->material_basic; 
+
 	//upload node uniforms
 	shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
 	shader->setUniform("u_camera_position", camera->eye);
@@ -33,10 +35,17 @@ void StandardMaterial::setUniforms(Camera* camera, Matrix44 model)
 	shader->setUniform("u_light_dir", light_dir->direction);
 	shader->setUniform("u_light_pos", light_dir->position);
 	shader->setUniform("u_alpha", light_dir->alpha); 
-	shader->setUniform("u_active", (float)app->material_basic->u_active);
+	shader->setUniform("u_active", (float)youMat->u_active);
 	
 	if (this->texture)
 		shader->setUniform("u_texture", this->texture,0);
+	if (youMat->tex_albedo && youMat->tex_metal && youMat->tex_normal && youMat->tex_rough) {
+		shader->setUniform("u_texAlbedo", youMat->tex_albedo, 1);
+		shader->setUniform("u_texMetal", youMat->tex_metal, 2);
+		shader->setUniform("u_texNormal", youMat->tex_normal, 3);
+		shader->setUniform("u_texRough", youMat->tex_rough, 4);
+	}
+
 }
 
 void StandardMaterial::render(Mesh* mesh, Matrix44 model, Camera* camera)

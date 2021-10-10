@@ -55,14 +55,19 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 		material_basic->meshBench = Mesh::Get("data/models/bench/bench.obj");
 
 		//Textures
-		material_basic->text_helmet = Texture::Get("data/models/helmet/albedo.png");
-		material_basic->text_ball = Texture::Get("data/models/ball/albedo.png");
-		material_basic->text_bench = Texture::Get("data/models/bench/albedo.png");
+		material_basic->text_helmet = Texture::Get("data/models/helmet/albedo.tga");
+		material_basic->text_ball = Texture::Get("data/models/ball/albedo.tga");
+		material_basic->text_bench = Texture::Get("data/models/bench/albedo.tga");
+		material_basic->tex_albedo = material_basic->text_ball;
+		material_basic->tex_normal = Texture::Get("data/models/ball/normal.tga");
+		material_basic->tex_metal = Texture::Get("data/models/ball/metalness.tga");
+		material_basic->tex_rough = Texture::Get("data/models/ball/roughness.tga");
 
 		//Shaders
 		material_basic->shader_flat = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");
 		material_basic->shader_phong = Shader::Get("data/shaders/basic.vs", "data/shaders/phong.fs");
 		material_basic->shader_reflective = Shader::Get("data/shaders/basic.vs", "data/shaders/reflective.fs");
+		material_basic->shader_pbr = Shader::Get("data/shaders/basic.vs", "data/shaders/pbr.fs");
 		
 		node->material->texture = material_basic->text_ball;
 		node->mesh = material_basic->meshHelmet;
@@ -108,6 +113,8 @@ void Application::render(void)
 			node_list[i]->material->shader = material_basic->shader_phong;
 		else if (material_basic->eMaterial == material_basic->REFLECTIVE)
 			node_list[i]->material->shader = material_basic->shader_reflective;
+		else if (material_basic->eMaterial == material_basic->PBR)
+			node_list[i]->material->shader = material_basic->shader_pbr;
 		node_list[i]->render(camera);
 
 		if(render_wireframe)
