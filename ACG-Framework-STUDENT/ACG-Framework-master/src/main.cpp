@@ -92,6 +92,7 @@ void renderGUI(SDL_Window* window, Application * game)
 	io.MousePos.y = Input::mouse_position.y;
 
 	assert(window);
+	//ImGui::ShowDemoWindow();
 
 	{
 		ImGui::Begin("Debugger");                          // Create a window called "Hello, world!" and append into it.

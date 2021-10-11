@@ -105,6 +105,7 @@ void Application::render(void)
 	//set flags
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
+	
 
 	for (size_t i = 0; i < node_list.size(); i++) {
 		if (material_basic->eMaterial == material_basic->TEXTURE)

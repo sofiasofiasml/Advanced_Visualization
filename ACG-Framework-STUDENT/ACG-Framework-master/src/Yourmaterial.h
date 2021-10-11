@@ -21,6 +21,11 @@ public:
 	Texture* tex_rough;
 	Texture* tex_metal;
 
+	//Factors PBR
+	float roughness_factor; 
+	float metal_factor; 
+	float normal_factor; 
+
 	//Mesh
 	Mesh* meshHelmet = NULL;
 	Mesh* meshSphere = NULL;
