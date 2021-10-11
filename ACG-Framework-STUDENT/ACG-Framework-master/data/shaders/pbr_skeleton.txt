@@ -7,16 +7,49 @@ uniform samplerCube u_texture_prem_2;
 uniform samplerCube u_texture_prem_3;
 uniform samplerCube u_texture_prem_4;
 
+varying vec2 v_uv;
+varying vec3 v_normal;
+varying vec3 v_world_position;
+varying vec3 v_position;
+
+uniform vec4 u_color;
+uniform vec3 u_ambient;
+uniform float u_light_intensity;
+uniform float u_alpha;
+uniform vec3 u_light_color;
+uniform vec3 u_light_dir;
+uniform vec3 u_light_pos;
+uniform vec3 u_camera_position;
+uniform samplerCube u_skybox;
+uniform sampler2D u_texture;
+uniform float u_active; 
+vec4 color; 
+vec3 light; 
+
+uniform sampler2D u_texAlbedo; 
+uniform sampler2D u_texMetal; 
+uniform sampler2D u_texNormal;
+uniform sampler2D u_texRough; 
+
+
+vec3 N; 
+vec3 L; 
+vec3 V; 
+vec3 R; 
+vec3 H; 
+
 const float GAMMA = 2.2;
 const float INV_GAMMA = 1.0 / GAMMA;
 
-struct PBRMat
+struct PBRMatStruct
 {
-	// prop 1
-	// prop 2
-	// ...
-	// prop N
-};
+	// properties
+	float roughness;
+	float metalness;
+	//...
+	// vectors
+	vec3 N;
+}newMaterial;
 
 // degamma
 vec3 gamma_to_linear(vec3 color)
@@ -116,14 +149,34 @@ vec3 toneMapUncharted(vec3 color)
     return color * whiteScale;
 }
 
+void computeVectors()
+{
+	N = normalize(v_normal); 
+	L = u_light_dir;
+
+	V = normalize(u_camera_position -v_world_position); 
+	R = reflect(-L, N); 
+
+	H = normalize(V + L);
+}
+
+//get diffuse and specular terms from direct lighting
+//	get diffuse and specular terms from IBL
+
+vec4 getPixelColor()
+{
+	return vec4(1.0);  //color = direct + ibl
+}
 void main()
 {
 	// 1. Create Material
 	// ...
-	
+	vec2 uv = v_uv;
+	computeVectors(); 
 	// 2. Fill Material
 	// ...
-
+	getMaterialProperties();
+	 
 	// 3. Shade (Direct + Indirect)
 	// ...
 
@@ -136,5 +189,5 @@ void main()
 	// Last step: to gamma space
 	// ...
 
-	gl_FragColor = vec4(1.0);
+	gl_FragColor = getPixelColor();
 }
