@@ -38,12 +38,10 @@ uniform sampler2D u_texRough;
 vec3 N; 
 vec3 L; 
 vec3 V; 
-vec3 F0 = vec3(0); 
 vec3 R; 
 vec3 H; 
 vec2 uv;
-vec4 metal;
-vec4 rough;
+
 const float GAMMA = 2.2;
 const float INV_GAMMA = 1.0 / GAMMA;
 
@@ -52,9 +50,13 @@ struct PBRMatStruct
 	// properties
 	float roughness;
 	float metalness;
-	//...
-	// vectors
+
+	vec3 metal;
+	vec3 rough;
 	vec3 N;
+	vec3 F0; 
+	vec3 light;
+
 }newMaterial;
 
 // degamma
@@ -158,38 +160,52 @@ vec3 toneMapUncharted(vec3 color)
 
 void computeVectors()
 {
+	newMaterial.F0 = vec3(0); 
+
 	N = normalize(v_normal); 
 	L = u_light_dir;
 
-	V = normalize(u_camera_position -v_world_position); 
+	V = normalize(u_camera_position - v_world_position); 
 	R = reflect(-L, N); 
 
 	H = normalize(V + L);
 }
 
 void getMaterialProperties(){
-	metal = texture2D(u_texMetal, uv) * u_Metal;
-	rough = texture2D(u_texRough, uv) * u_Rough;
-	if (u_Metal != 0) //
-		F0 = vec3(0.04f);
+	
+	newMaterial.metalness = texture2D(u_texMetal, uv).w ; //homogeneous vertex coordinate
+	newMaterial.roughness = texture2D(u_texRough, uv).w ;
+
+	if (u_Metal != 0)
+		newMaterial.F0 = vec3(0.04f);
+	
+	newMaterial.F0 = vec3(0.5f);
+	float cosTheta = dot(v_world_position, N);
+	newMaterial.rough =  FresnelSchlickRoughness(cosTheta, newMaterial.F0, newMaterial.roughness)*u_Rough;
+	vec3 color = texture2D(u_texture, uv).xyz;
+	vec3 diffuseColor = (1.0 - newMaterial.metalness) * color;
+	vec3 Fd_d = diffuseColor * dot(N,L);
+	light = Fd_d +  newMaterial.rough;
+	light =  newMaterial.rough;
 }
 //get diffuse and specular terms from direct lighting
 //get diffuse and specular terms from IBL
 
 vec4 getPixelColor()
 {
-	return vec4(metal*rough);  //color = direct + ibl
+	return vec4(newMaterial.light, 1.0f);  //color = direct + ibl
 }
 void main()
 {
 	// 1. Create Material
 	// ...
+	newMaterial;
 	uv = v_uv;
 	computeVectors(); 
 	// 2. Fill Material
 	// ...
 	getMaterialProperties();
-	 
+	
 	// 3. Shade (Direct + Indirect)
 	// ...
 
@@ -198,9 +214,12 @@ void main()
 
 	// 5. Any extra texture to apply after tonemapping
 	// ...
+	/*
+	vec3 normal_pixel = texture2D(u_texNormal,uv).xyz;
+	vec4 normal = vec4(perturbNormal( N, V, uv, normal_pixel),1.0f);
+	*/
 
 	// Last step: to gamma space
 	// ...
-
-	gl_FragColor = getPixelColor();
+	gl_FragColor =  texture2D(u_texture, uv) * getPixelColor();
 }

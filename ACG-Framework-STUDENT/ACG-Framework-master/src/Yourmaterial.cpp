@@ -5,7 +5,7 @@
 yourmaterial::yourmaterial()
 {
 	eMaterial = TEXTURE; //we init the material at texture
-	eTexture = BALL; 
+	eTexture = BENCH; 
 	u_active = 0; 
 	active_bool = 0; 
 	this->tex_albedo = new Texture();
