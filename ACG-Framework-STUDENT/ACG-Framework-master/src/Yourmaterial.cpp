@@ -12,9 +12,11 @@ yourmaterial::yourmaterial()
 	this->tex_normal = new Texture();
 	this->tex_metal = new Texture();
 	this->tex_rough = new Texture();
+	
 	this->roughness_factor =1.0f;
 	this->metal_factor = 1.05f;
 	this->normal_factor= 1.0f;
+	loadHdr();
 }
 
 void yourmaterial::renderInMenu()
@@ -33,6 +35,21 @@ void yourmaterial::renderInMenu()
 		ImGui::DragFloat("Metalness", &this->metal_factor, 0.01f, 0, 1.0f);
 		ImGui::DragFloat("Roughness", &this->roughness_factor, 0.01f, 0, 1.0f);
 		ImGui::DragFloat("Normal", &this->normal_factor, 0.01f, 0, 1.0f);
+	}
+	
+}
+
+
+void yourmaterial::loadHdr()
+{
+	//We load the 3D images and the options are for the imGui
+	
+	this->hdre = HDRE::Get("data/environments/studio.hdre");
+
+	for (int i = 0; i < LEVEL; i++)
+	{
+		this->hdr_tex[i]= new Texture();
+		this->hdr_tex[i]->cubemapFromHDRE(hdre, LEVEL);
 	}
 	
 }

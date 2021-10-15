@@ -26,6 +26,7 @@ uniform float u_active;
 uniform float u_Metal; 
 uniform float u_Rough; 
 uniform float u_Normal; 
+//uniform vec3 u_difuse;
 vec4 color; 
 vec3 light; 
 
@@ -56,6 +57,7 @@ struct PBRMatStruct
 	vec3 N;
 	vec3 F0; 
 	vec3 light;
+	vec3 DifussedDirect;
 
 }newMaterial;
 
@@ -76,17 +78,17 @@ vec3 getReflectionColor(vec3 r, float roughness)
 	float lod = roughness * 5.0;
 
 	vec4 color;
-
-	/*if(lod < 1.0) color = mix( textureCube(u_texture, r), textureCube(u_texture_prem_0, r), lod );
+/*
+	if(lod < 1.0) color = mix( textureCube(u_texture, r), textureCube(u_texture_prem_0, r), lod );
 	else if(lod < 2.0) color = mix( textureCube(u_texture_prem_0, r), textureCube(u_texture_prem_1, r), lod - 1.0 );
 	else if(lod < 3.0) color = mix( textureCube(u_texture_prem_1, r), textureCube(u_texture_prem_2, r), lod - 2.0 );
 	else if(lod < 4.0) color = mix( textureCube(u_texture_prem_2, r), textureCube(u_texture_prem_3, r), lod - 3.0 );
-	else if(lod < 5.0) color = mix( textureCube(u_texture_prem_3, r), textureCube(u_skybox, r), lod - 4.0 );
-	else color = textureCube(u_skybox, r);
+	else if(lod < 5.0) color = mix( textureCube(u_texture_prem_3, r), textureCube(u_texture_prem_4, r), lod - 4.0 );
+	else color = textureCube(u_texture_prem_4, r);
+*/
+	//color.rgb = linear_to_gamma(color.rgb);
 
-	color.rgb = linear_to_gamma(color.rgb);
-
-	return color.rgb;*/
+	return color.rgb;
 	return vec4(1.0f);
 }
 
@@ -172,11 +174,15 @@ void computeVectors()
 }
 
 void getMaterialProperties(){
+	//Direct light
+	//newMaterial.DifussedDirect = u_difuse/PI;
 	
+
+	//Indirecta
 	newMaterial.metalness = texture2D(u_texMetal, uv).w ; //homogeneous vertex coordinate
 	newMaterial.roughness = texture2D(u_texRough, uv).w ;
 
-	if (u_Metal != 0)
+	if (newMaterial.metalness != 0)
 		newMaterial.F0 = vec3(0.04f);
 	
 	newMaterial.F0 = vec3(0.5f);
@@ -202,6 +208,9 @@ void main()
 	newMaterial;
 	uv = v_uv;
 	computeVectors(); 
+	vec3 normal_pixel = texture2D(u_texNormal,uv).xyz;
+	vec3 normal = perturbNormal( N, V, uv, normal_pixel);
+	N = normal;
 	// 2. Fill Material
 	// ...
 	getMaterialProperties();
@@ -214,12 +223,12 @@ void main()
 
 	// 5. Any extra texture to apply after tonemapping
 	// ...
-	/*
-	vec3 normal_pixel = texture2D(u_texNormal,uv).xyz;
-	vec4 normal = vec4(perturbNormal( N, V, uv, normal_pixel),1.0f);
-	*/
+	
+	
+	//normal = normal - v_normal;
+	
 
 	// Last step: to gamma space
 	// ...
-	gl_FragColor =  texture2D(u_texture, uv) * getPixelColor();
+	gl_FragColor =  texture2D(u_texture, uv); //* getPixelColor();
 }

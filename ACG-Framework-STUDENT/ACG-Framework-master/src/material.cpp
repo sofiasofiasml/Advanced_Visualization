@@ -47,6 +47,14 @@ void StandardMaterial::setUniforms(Camera* camera, Matrix44 model)
 		shader->setUniform("u_texNormal", youMat->tex_normal, 3);
 		shader->setUniform("u_texRough", youMat->tex_rough, 4);
 	}
+	if (youMat->hdr_tex) 
+	{
+		shader->setUniform("u_texture_prem_0", youMat->hdr_tex[0], 5);
+		shader->setUniform("u_texture_prem_1", youMat->hdr_tex[1], 6);
+		shader->setUniform("u_texture_prem_2", youMat->hdr_tex[2], 7);
+		shader->setUniform("u_texture_prem_3", youMat->hdr_tex[3], 8);
+		shader->setUniform("u_texture_prem_4", youMat->hdr_tex[4], 9);
+	}
 
 }
 

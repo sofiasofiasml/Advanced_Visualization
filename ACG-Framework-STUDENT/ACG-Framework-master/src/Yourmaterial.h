@@ -1,6 +1,8 @@
 #pragma once
 #include "material.h"
 #include "texture.h"
+
+#define LEVEL 5
 class yourmaterial : public StandardMaterial
 {
 public:
@@ -20,6 +22,17 @@ public:
 	Texture* tex_normal;
 	Texture* tex_rough;
 	Texture* tex_metal;
+
+	/*Texture* hdre_tex;
+	Texture* hdre_tex_1;
+	Texture* hdre_tex_2;
+	Texture* hdre_tex_3;
+	Texture* hdre_tex_4;*/
+
+	Texture* hdr_tex[LEVEL];
+
+	HDRE* hdre;
+
 
 	//Factors PBR
 	float roughness_factor; 
@@ -43,5 +56,5 @@ public:
 
 	yourmaterial();
 	void renderInMenu();
-
+	void loadHdr();
 };
