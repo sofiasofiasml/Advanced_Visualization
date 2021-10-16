@@ -62,6 +62,7 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 		material_basic->tex_normal = Texture::Get("data/models/lantern/normal.tga");
 		material_basic->tex_metal = Texture::Get("data/models/lantern/metalness.tga");
 		material_basic->tex_rough = Texture::Get("data/models/lantern/roughness.tga");
+		material_basic->brdf_tex = Texture::Get("data/brdfLUT.png");
 
 		//Shaders
 		material_basic->shader_flat = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");

@@ -34,6 +34,8 @@ uniform sampler2D u_texAlbedo;
 uniform sampler2D u_texMetal; 
 uniform sampler2D u_texNormal;
 uniform sampler2D u_texRough; 
+uniform sampler2D u_brdf; 
+
 
 
 vec3 N; 
@@ -89,7 +91,6 @@ vec3 getReflectionColor(vec3 r, float roughness)
 	//color.rgb = linear_to_gamma(color.rgb);
 
 	return color.rgb;
-	return vec4(1.0f);
 }
 
 //Javi Agenjo Snipet for Bump Mapping
@@ -173,11 +174,25 @@ void computeVectors()
 	H = normalize(V + L);
 }
 
+vec3 computeSpecularIBL()
+{
+	vec3 specularSample = getReflectionColor(R, newMaterial.roughness);
+	vec3 specularBRDF = newMaterial.rough * texture2D(u_brdf,uv).x * texture2D(u_brdf,uv).y ;
+	vec3 specularIBL = specularSample * specularBRDF;
+	return specularIBL;
+}
+vec3 computeDiffuseIBL(vec3 color)
+{
+	vec3 diffuseSample = getReflectionColor(N, newMaterial.metalness); //creo que va metal aqui no estoy segura
+	vec3 diffuseBRDF =  color;
+	vec3 diffuseIBL = diffuseSample * diffuseBRDF;
+	return diffuseIBL;
+}
+
 void getMaterialProperties(){
 	//Direct light
 	//newMaterial.DifussedDirect = u_difuse/PI;
 	
-
 	//Indirecta
 	newMaterial.metalness = texture2D(u_texMetal, uv).w ; //homogeneous vertex coordinate
 	newMaterial.roughness = texture2D(u_texRough, uv).w ;
@@ -185,14 +200,13 @@ void getMaterialProperties(){
 	if (newMaterial.metalness != 0)
 		newMaterial.F0 = vec3(0.04f);
 	
-	newMaterial.F0 = vec3(0.5f);
 	float cosTheta = dot(v_world_position, N);
 	newMaterial.rough =  FresnelSchlickRoughness(cosTheta, newMaterial.F0, newMaterial.roughness)*u_Rough;
 	vec3 color = texture2D(u_texture, uv).xyz;
-	vec3 diffuseColor = (1.0 - newMaterial.metalness) * color;
-	vec3 Fd_d = diffuseColor * dot(N,L);
-	light = Fd_d +  newMaterial.rough;
-	light =  newMaterial.rough;
+	vec3 specularIBL = computeSpecularIBL();
+	vec3 difusseIBL = computeDiffuseIBL(color);
+	difusseIBL *= (1- newMaterial.rough); //Energy conservation
+	newMaterial.light = specularIBL + difusseIBL;
 }
 //get diffuse and specular terms from direct lighting
 //get diffuse and specular terms from IBL
@@ -230,5 +244,5 @@ void main()
 
 	// Last step: to gamma space
 	// ...
-	gl_FragColor =  texture2D(u_texture, uv); //* getPixelColor();
+	gl_FragColor =  texture2D(u_texture, uv) * getPixelColor();
 }

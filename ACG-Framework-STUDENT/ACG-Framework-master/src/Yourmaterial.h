@@ -23,6 +23,9 @@ public:
 	Texture* tex_rough;
 	Texture* tex_metal;
 
+	Texture* brdf_tex;
+	
+
 	Texture* hdr_tex[LEVEL];
 
 	HDRE* hdre;
