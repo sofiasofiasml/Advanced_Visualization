@@ -35,7 +35,14 @@ uniform sampler2D u_texNormal;
 uniform sampler2D u_texRough; 
 uniform sampler2D u_opacity; 
 uniform sampler2D u_brdf; 
+uniform sampler2D u_ao; 
+uniform sampler2D u_emissive; 
 
+//imGui
+uniform int u_is_normal;
+uniform int u_is_opacity;
+uniform int u_is_ao;
+uniform int u_is_emissive;
 
 
 vec3 N; 
@@ -251,11 +258,9 @@ void getMaterialProperties(){
 	newMaterial.roughness = texture2D(u_texRough, uv).w ;
 	vec3 color = texture2D(u_texture, uv).xyz;
 
-	if (newMaterial.metalness != 0)
-		newMaterial.F0 = vec3(0.04f);
-	else 
-		newMaterial.F0 = color;
-		
+	//we compute the reflection in base to the color and the metalness
+	newMaterial.F0  = mix( vec3(0.04), color.xyz, newMaterial.metalness );
+
 	float cosTheta = max(dot(N, V),0.0);
 	newMaterial.rough =  FresnelSchlickRoughness(cosTheta, newMaterial.F0, newMaterial.roughness)*u_Rough;
 
@@ -269,8 +274,18 @@ void getMaterialProperties(){
 	vec3 F_aux = FresnelSchlickRoughness(cosTheta, newMaterial.F0, newMaterial.metalness);
 	difusseIBL *= (1- F_aux); //Energy conservation
 	
-	//Final 
-	newMaterial.light = specular + diffuse + specularIBL + difusseIBL;
+
+	float ao = texture2D(u_ao,uv).r;
+	vec3 emissive = texture2D(u_emissive,uv).xyz;
+	//we could play with the curve to have more control
+
+	vec3 Indirect = specularIBL + difusseIBL;
+	if (u_is_ao == 1)
+		Indirect = ao * Indirect;
+	//Final -MURIPLICAR POR COLOR INTENSIDAD..
+	newMaterial.light = specular + diffuse + Indirect;
+	if (u_is_emissive == 1)
+		newMaterial.light += emissive;
 }
 //get diffuse and specular terms from direct lighting
 //get diffuse and specular terms from IBL
@@ -288,7 +303,8 @@ void main()
 	computeVectors(); 
 	vec3 normal_pixel = texture2D(u_texNormal,uv).xyz;
 	vec3 normal = perturbNormal( N, V, uv, normal_pixel);
-	N = normal;
+	if (u_is_normal == 1)
+		N = normal;
 	// 2. Fill Material
 	// ...
 	getMaterialProperties();
@@ -310,8 +326,13 @@ void main()
 	// Last step: to gamma space
 	// ...
 	vec4 color = texture2D(u_texture, uv);
-	gl_FragColor =   * getPixelColor();
+	gl_FragColor =  color * getPixelColor();
 
-	gl_FragColor.a = opacity;
+	if (u_is_opacity == 1)
+	{
+		if(opacity != 1) //no acabado
+			gl_FragColor.a = opacity;
+	}
+		
 
 }

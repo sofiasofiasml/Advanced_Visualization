@@ -41,6 +41,13 @@ void StandardMaterial::setUniforms(Camera* camera, Matrix44 model)
 	shader->setUniform("u_Normal", youMat->normal_factor);
 	shader->setUniform("u_brdf", youMat->brdf_tex, 11);
 	shader->setUniform("u_opacity", youMat->opacity_tex, 12);
+	shader->setUniform1("u_is_normal", youMat->is_normal);
+	shader->setUniform1("u_is_opacity", youMat->is_opacity);
+	shader->setUniform1("u_is_ao", youMat->is_ao);
+	shader->setUniform1("u_is_emissive", youMat->is_emissive);
+	shader->setUniform("u_ao", youMat->ao_tex, 13);
+	shader->setUniform("u_emissive", youMat->emissive_tex, 14);
+
 
 	if (this->texture)
 		shader->setUniform("u_texture", this->texture,0);

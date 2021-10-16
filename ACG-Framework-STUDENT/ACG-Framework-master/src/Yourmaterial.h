@@ -24,8 +24,15 @@ public:
 	Texture* tex_metal;
 
 	Texture* brdf_tex;
+	Texture* ao_tex;
 	Texture* opacity_tex;
-	
+	Texture* emissive_tex;
+
+	int is_normal;
+	int is_opacity;
+	int is_ao;
+	int is_emissive;
+	//
 
 	Texture* hdr_tex[LEVEL];
 

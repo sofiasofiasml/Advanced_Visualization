@@ -59,11 +59,13 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 		material_basic->text_ball = Texture::Get("data/models/ball/albedo.tga");
 		material_basic->text_bench = Texture::Get("data/models/lantern/albedo.tga");
 		material_basic->tex_albedo = material_basic->text_bench; // cubemap in shader 
-		material_basic->tex_normal = Texture::Get("data/models/lantern/normal.tga");
-		material_basic->tex_metal = Texture::Get("data/models/lantern/metalness.tga");
-		material_basic->tex_rough = Texture::Get("data/models/lantern/roughness.tga");
+		material_basic->tex_normal = Texture::Get("data/models/helmet/normal.tga");
+		material_basic->tex_metal = Texture::Get("data/models/helmet/metalness.tga");
+		material_basic->tex_rough = Texture::Get("data/models/helmet/roughness.tga");
 		material_basic->brdf_tex = Texture::Get("data/brdfLUT.png");
-		material_basic->opacity_tex = Texture::Get("data/models/lantern/opacity.tga");
+		material_basic->opacity_tex = Texture::Get("data/models/helmet/opacity.tga");
+		material_basic->opacity_tex = Texture::Get("data/models/helmet/ao.tga");
+		material_basic->emissive_tex = Texture::Get("data/models/helmet/emissive.tga");
 
 		//Shaders
 		material_basic->shader_flat = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");
@@ -71,10 +73,10 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 		material_basic->shader_reflective = Shader::Get("data/shaders/basic.vs", "data/shaders/reflective.fs");
 		material_basic->shader_pbr = Shader::Get("data/shaders/basic.vs", "data/shaders/pbr.fs");
 		
-		node->material->texture = material_basic->text_bench; // sample2d in shader
-		node->mesh = material_basic->meshBench;
+		node->material->texture = material_basic->text_helmet; // sample2d in shader
+		node->mesh = material_basic->meshHelmet;
 		node->model.translate(0, 1, 0);
-		node->model.scale(0.02, 0.02, 0.02);
+		//node->model.scale(0.02, 0.02, 0.02);
 		node_list.push_back(node);
 	}
 	
@@ -127,17 +129,17 @@ void Application::render(void)
 
 		//We change the mesh if we change the imGui options
 		if (node_list[i]->mesh_selected == 0)
-			node_list[i]->mesh = material_basic->meshBench;
+			node_list[i]->mesh = material_basic->meshHelmet;
 		else if (node_list[i]->mesh_selected == 1)
 			node_list[i]->mesh = material_basic->meshSphere;
 		else if (node_list[i]->mesh_selected == 2)
-			node_list[i]->mesh = material_basic->meshHelmet;
+			node_list[i]->mesh = material_basic->meshBench;
 
 		//We change the texture if we change the imGui options
 		if (material_basic->eTexture == 0)
-			node_list[i]->material->texture = material_basic->text_ball;
-		else if (material_basic->eTexture == 1)
 			node_list[i]->material->texture = material_basic->text_helmet;
+		else if (material_basic->eTexture == 1)
+			node_list[i]->material->texture = material_basic->text_ball;
 		else if (material_basic->eTexture == 2) //lantern
 			node_list[i]->material->texture = material_basic->text_bench;
 	}
