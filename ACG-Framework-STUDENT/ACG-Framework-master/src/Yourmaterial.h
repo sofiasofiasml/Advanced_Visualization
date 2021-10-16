@@ -24,6 +24,7 @@ public:
 	Texture* tex_metal;
 
 	Texture* brdf_tex;
+	Texture* opacity_tex;
 	
 
 	Texture* hdr_tex[LEVEL];

@@ -33,6 +33,7 @@ uniform sampler2D u_texAlbedo;
 uniform sampler2D u_texMetal; 
 uniform sampler2D u_texNormal;
 uniform sampler2D u_texRough; 
+uniform sampler2D u_opacity; 
 uniform sampler2D u_brdf; 
 
 
@@ -248,13 +249,15 @@ vec3 computeDiffuseIBL(vec3 color)
 void getMaterialProperties(){
 	newMaterial.metalness = texture2D(u_texMetal, uv).r ; //homogeneous vertex coordinate
 	newMaterial.roughness = texture2D(u_texRough, uv).w ;
+	vec3 color = texture2D(u_texture, uv).xyz;
 
 	if (newMaterial.metalness != 0)
 		newMaterial.F0 = vec3(0.04f);
-	
+	else 
+		newMaterial.F0 = color;
+		
 	float cosTheta = max(dot(N, V),0.0);
 	newMaterial.rough =  FresnelSchlickRoughness(cosTheta, newMaterial.F0, newMaterial.roughness)*u_Rough;
-	vec3 color = texture2D(u_texture, uv).xyz;
 
 	//Direct light
 	vec3 specular = computeSpecularDirect();
@@ -298,6 +301,7 @@ void main()
 
 	// 5. Any extra texture to apply after tonemapping
 	// ...
+	float opacity = texture2D(u_opacity,uv).r;
 	
 	
 	//normal = normal - v_normal;
@@ -305,5 +309,9 @@ void main()
 
 	// Last step: to gamma space
 	// ...
-	gl_FragColor =  texture2D(u_texture, uv) * getPixelColor();
+	vec4 color = texture2D(u_texture, uv);
+	gl_FragColor =   * getPixelColor();
+
+	gl_FragColor.a = opacity;
+
 }

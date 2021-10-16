@@ -40,6 +40,7 @@ void StandardMaterial::setUniforms(Camera* camera, Matrix44 model)
 	shader->setUniform("u_Rough", youMat->roughness_factor);
 	shader->setUniform("u_Normal", youMat->normal_factor);
 	shader->setUniform("u_brdf", youMat->brdf_tex, 11);
+	shader->setUniform("u_opacity", youMat->opacity_tex, 12);
 
 	if (this->texture)
 		shader->setUniform("u_texture", this->texture,0);

@@ -63,6 +63,7 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 		material_basic->tex_metal = Texture::Get("data/models/lantern/metalness.tga");
 		material_basic->tex_rough = Texture::Get("data/models/lantern/roughness.tga");
 		material_basic->brdf_tex = Texture::Get("data/brdfLUT.png");
+		material_basic->opacity_tex = Texture::Get("data/models/lantern/opacity.tga");
 
 		//Shaders
 		material_basic->shader_flat = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");
@@ -107,7 +108,8 @@ void Application::render(void)
 	//set flags
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
-
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	for (size_t i = 0; i < node_list.size(); i++) {
 		if (material_basic->eMaterial == material_basic->TEXTURE)
@@ -139,6 +141,8 @@ void Application::render(void)
 		else if (material_basic->eTexture == 2) //lantern
 			node_list[i]->material->texture = material_basic->text_bench;
 	}
+	glDisable(GL_BLEND);
+
 }
 
 void Application::update(double seconds_elapsed)

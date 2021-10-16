@@ -13,6 +13,8 @@ yourmaterial::yourmaterial()
 	this->tex_metal = new Texture();
 	this->tex_rough = new Texture();
 	this->brdf_tex = new Texture();
+	this->opacity_tex = new Texture();
+
 	
 	this->roughness_factor =1.0f;
 	this->metal_factor = 1.05f;
