@@ -1,6 +1,6 @@
 #define PI 3.14159265359
 #define RECIPROCAL_PI 0.3183098861837697
-
+uniform samplerCube u_albedo;
 uniform samplerCube u_texture_prem_0;
 uniform samplerCube u_texture_prem_1;
 uniform samplerCube u_texture_prem_2;
@@ -78,14 +78,14 @@ vec3 getReflectionColor(vec3 r, float roughness)
 	float lod = roughness * 5.0;
 
 	vec4 color;
-/*
-	if(lod < 1.0) color = mix( textureCube(u_texture, r), textureCube(u_texture_prem_0, r), lod );
+
+	if(lod < 1.0) color = mix( textureCube(u_albedo, r), textureCube(u_texture_prem_0, r), lod );
 	else if(lod < 2.0) color = mix( textureCube(u_texture_prem_0, r), textureCube(u_texture_prem_1, r), lod - 1.0 );
 	else if(lod < 3.0) color = mix( textureCube(u_texture_prem_1, r), textureCube(u_texture_prem_2, r), lod - 2.0 );
 	else if(lod < 4.0) color = mix( textureCube(u_texture_prem_2, r), textureCube(u_texture_prem_3, r), lod - 3.0 );
 	else if(lod < 5.0) color = mix( textureCube(u_texture_prem_3, r), textureCube(u_texture_prem_4, r), lod - 4.0 );
 	else color = textureCube(u_texture_prem_4, r);
-*/
+
 	//color.rgb = linear_to_gamma(color.rgb);
 
 	return color.rgb;

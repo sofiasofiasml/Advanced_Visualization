@@ -23,12 +23,6 @@ public:
 	Texture* tex_rough;
 	Texture* tex_metal;
 
-	/*Texture* hdre_tex;
-	Texture* hdre_tex_1;
-	Texture* hdre_tex_2;
-	Texture* hdre_tex_3;
-	Texture* hdre_tex_4;*/
-
 	Texture* hdr_tex[LEVEL];
 
 	HDRE* hdre;

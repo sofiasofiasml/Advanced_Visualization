@@ -57,11 +57,11 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 		//Textures
 		material_basic->text_helmet = Texture::Get("data/models/helmet/albedo.tga");
 		material_basic->text_ball = Texture::Get("data/models/ball/albedo.tga");
-		material_basic->text_bench = Texture::Get("data/models/lantern/albedo.png");
-		material_basic->tex_albedo = material_basic->text_ball;
-		material_basic->tex_normal = Texture::Get("data/models/lantern/normal.png");
-		material_basic->tex_metal = Texture::Get("data/models/lantern/metalness.png");
-		material_basic->tex_rough = Texture::Get("data/models/lantern/roughness.png");
+		material_basic->text_bench = Texture::Get("data/models/lantern/albedo.tga");
+		material_basic->tex_albedo = material_basic->text_bench; // cubemap in shader 
+		material_basic->tex_normal = Texture::Get("data/models/lantern/normal.tga");
+		material_basic->tex_metal = Texture::Get("data/models/lantern/metalness.tga");
+		material_basic->tex_rough = Texture::Get("data/models/lantern/roughness.tga");
 
 		//Shaders
 		material_basic->shader_flat = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");
@@ -69,7 +69,7 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 		material_basic->shader_reflective = Shader::Get("data/shaders/basic.vs", "data/shaders/reflective.fs");
 		material_basic->shader_pbr = Shader::Get("data/shaders/basic.vs", "data/shaders/pbr.fs");
 		
-		node->material->texture = material_basic->text_bench;
+		node->material->texture = material_basic->text_bench; // sample2d in shader
 		node->mesh = material_basic->meshBench;
 		node->model.translate(0, 1, 0);
 		node->model.scale(0.02, 0.02, 0.02);
@@ -135,7 +135,7 @@ void Application::render(void)
 			node_list[i]->material->texture = material_basic->text_ball;
 		else if (material_basic->eTexture == 1)
 			node_list[i]->material->texture = material_basic->text_helmet;
-		else if (material_basic->eTexture == 2)
+		else if (material_basic->eTexture == 2) //lantern
 			node_list[i]->material->texture = material_basic->text_bench;
 	}
 	
