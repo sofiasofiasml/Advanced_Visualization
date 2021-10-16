@@ -25,8 +25,7 @@ uniform sampler2D u_texture;
 uniform float u_active; 
 uniform float u_Metal; 
 uniform float u_Rough; 
-uniform float u_Normal; 
-//uniform vec3 u_difuse;
+uniform float u_Normal;
 vec4 color; 
 vec3 light; 
 
@@ -44,10 +43,10 @@ vec3 V;
 vec3 R; 
 vec3 H; 
 vec2 uv;
-
+float NdotV ; 
 const float GAMMA = 2.2;
 const float INV_GAMMA = 1.0 / GAMMA;
-
+vec3 F;
 struct PBRMatStruct
 {
 	// properties
@@ -166,47 +165,109 @@ void computeVectors()
 	newMaterial.F0 = vec3(0); 
 
 	N = normalize(v_normal); 
-	L = u_light_dir;
+	L = normalize(u_light_dir);
 
 	V = normalize(u_camera_position - v_world_position); 
 	R = reflect(-L, N); 
 
 	H = normalize(V + L);
+	NdotV = dot(N,V);
+}
+// Normal Distribution Function using GGX Distribution
+float D_GGX (const in float NoH, const in float linearRoughness )
+{
+	float a2 = linearRoughness * linearRoughness;
+	float f = (NoH * NoH) * (a2 - 1.0) + 1.0;
+	return a2 / (PI * f * f);
+}
+// Fresnel term with colorized fresnel
+vec3 F_Schlick( const in float VoH, const in vec3 f0)
+{
+	float f = pow(1.0 - VoH, 5.0);
+	return f0 + (vec3(1.0) - f0) * f;
+}
+// Geometry Term: Geometry masking/shadowing due to microfacets
+float GGX(float NdotV, float k){
+	return NdotV / (NdotV * (1.0 - k) + k);
+}
+	
+float G_Smith( float NdotV, float NdotL, float roughness)
+{
+	float k = pow(roughness + 1.0, 2.0) / 8.0;
+	return GGX(NdotL, k) * GGX(NdotV, k);
 }
 
+vec3 computeSpecularDirect()
+{
+	float a = newMaterial.roughness * newMaterial.roughness;
+	float NoH = dot(N,H);
+
+	// Normal Distribution Function
+	float D = D_GGX( NoH, a );
+	float LoH = dot(L,H);
+	float NoL = dot(-L,N);
+	float NoV = dot(V,N);
+	// Fresnel Function
+	F = F_Schlick( LoH, newMaterial.F0 );
+
+	// Visibility Function (shadowing/masking)
+	float G = G_Smith( NoV, NoL, newMaterial.roughness );
+		
+	// Norm factor
+	vec3 spec = D * G * F;
+	spec /= (4.0 * NoL * NoV + 1e-6);
+
+	return spec;
+
+}
+vec3 computeDiffuseDirect(vec3 color)
+{
+	//metallic materials do not have diffuse
+	vec3 diffuse = (1-newMaterial.metalness)* color;
+	float NoL = dot(L,N);
+	diffuse = diffuse * NoL;
+	return diffuse;
+}
+
+//IBL
 vec3 computeSpecularIBL()
 {
 	vec3 specularSample = getReflectionColor(R, newMaterial.roughness);
-	vec3 specularBRDF = newMaterial.rough * texture2D(u_brdf,uv).x * texture2D(u_brdf,uv).y ;
+	vec3 specularBRDF = newMaterial.rough * texture2D(u_brdf,vec2(NdotV, newMaterial.roughness)).x * texture2D(u_brdf,vec2(NdotV, newMaterial.roughness)).y ;
 	vec3 specularIBL = specularSample * specularBRDF;
 	return specularIBL;
 }
 vec3 computeDiffuseIBL(vec3 color)
 {
-	vec3 diffuseSample = getReflectionColor(N, newMaterial.metalness); //creo que va metal aqui no estoy segura
+	vec3 diffuseSample = getReflectionColor(N, newMaterial.metalness);
 	vec3 diffuseBRDF =  color;
 	vec3 diffuseIBL = diffuseSample * diffuseBRDF;
 	return diffuseIBL;
 }
 
 void getMaterialProperties(){
-	//Direct light
-	//newMaterial.DifussedDirect = u_difuse/PI;
-	
-	//Indirecta
-	newMaterial.metalness = texture2D(u_texMetal, uv).w ; //homogeneous vertex coordinate
+	newMaterial.metalness = texture2D(u_texMetal, uv).r ; //homogeneous vertex coordinate
 	newMaterial.roughness = texture2D(u_texRough, uv).w ;
 
 	if (newMaterial.metalness != 0)
 		newMaterial.F0 = vec3(0.04f);
 	
-	float cosTheta = dot(v_world_position, N);
+	float cosTheta = max(dot(N, V),0.0);
 	newMaterial.rough =  FresnelSchlickRoughness(cosTheta, newMaterial.F0, newMaterial.roughness)*u_Rough;
 	vec3 color = texture2D(u_texture, uv).xyz;
+
+	//Direct light
+	vec3 specular = computeSpecularDirect();
+	vec3 diffuse  = computeDiffuseDirect(color);
+
+	//Indirecta
 	vec3 specularIBL = computeSpecularIBL();
 	vec3 difusseIBL = computeDiffuseIBL(color);
-	difusseIBL *= (1- newMaterial.rough); //Energy conservation
-	newMaterial.light = specularIBL + difusseIBL;
+	vec3 F_aux = FresnelSchlickRoughness(cosTheta, newMaterial.F0, newMaterial.metalness);
+	difusseIBL *= (1- F_aux); //Energy conservation
+	
+	//Final 
+	newMaterial.light = specular + diffuse + specularIBL + difusseIBL;
 }
 //get diffuse and specular terms from direct lighting
 //get diffuse and specular terms from IBL

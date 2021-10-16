@@ -107,7 +107,7 @@ void Application::render(void)
 	//set flags
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
-	
+
 
 	for (size_t i = 0; i < node_list.size(); i++) {
 		if (material_basic->eMaterial == material_basic->TEXTURE)
@@ -139,7 +139,6 @@ void Application::render(void)
 		else if (material_basic->eTexture == 2) //lantern
 			node_list[i]->material->texture = material_basic->text_bench;
 	}
-	
 }
 
 void Application::update(double seconds_elapsed)
