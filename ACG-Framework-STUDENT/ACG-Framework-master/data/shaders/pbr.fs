@@ -55,6 +55,7 @@ float NdotV ;
 const float GAMMA = 2.2;
 const float INV_GAMMA = 1.0 / GAMMA;
 vec3 F;
+
 struct PBRMatStruct
 {
 	// properties
@@ -213,7 +214,7 @@ vec3 computeSpecularDirect()
 	// Normal Distribution Function
 	float D = D_GGX( NoH, a );
 	float LoH = dot(L,H);
-	float NoL = dot(-L,N);
+	float NoL = dot(L,N);
 	float NoV = dot(V,N);
 	// Fresnel Function
 	F = F_Schlick( LoH, newMaterial.F0 );
@@ -254,8 +255,8 @@ vec3 computeDiffuseIBL(vec3 color)
 }
 
 void getMaterialProperties(){
-	newMaterial.metalness = texture2D(u_texMetal, uv).r ; //homogeneous vertex coordinate
-	newMaterial.roughness = texture2D(u_texRough, uv).w ;
+	newMaterial.metalness = texture2D(u_texRough, uv).y ; //homogeneous vertex coordinate
+	newMaterial.roughness = texture2D(u_texRough, uv).z ;
 	vec3 color = texture2D(u_texture, uv).xyz;
 
 	//we compute the reflection in base to the color and the metalness
@@ -283,7 +284,7 @@ void getMaterialProperties(){
 	if (u_is_ao == 1)
 		Indirect = ao * Indirect;
 	//Final -MURIPLICAR POR COLOR INTENSIDAD..
-	newMaterial.light = specular + diffuse + Indirect;
+	newMaterial.light = diffuse + specular;// + diffuse;// + Indirect;
 	if (u_is_emissive == 1)
 		newMaterial.light += emissive;
 }
@@ -298,7 +299,7 @@ void main()
 {
 	// 1. Create Material
 	// ...
-	newMaterial;
+	newMaterial; //newMaterial nombre
 	uv = v_uv;
 	computeVectors(); 
 	vec3 normal_pixel = texture2D(u_texNormal,uv).xyz;
