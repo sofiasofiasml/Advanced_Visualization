@@ -220,12 +220,12 @@ vec3 computeSpecularDirect()
 	F = F_Schlick( LoH, newMaterial.F0 );
 
 	// Visibility Function (shadowing/masking)
-	float G = G_Smith( NoV, NoL, newMaterial.roughness );
+	float G = G_Smith( NoV, LoH,newMaterial.roughness);
 		
 	// Norm factor
 	vec3 spec = D * G * F;
 	spec /= (4.0 * NoL * NoV + 1e-6);
-
+	spec =  spec* NoL;
 	return spec;
 
 }
@@ -241,15 +241,18 @@ vec3 computeDiffuseDirect(vec3 color)
 //IBL
 vec3 computeSpecularIBL()
 {
+	float NoV = dot(V,N);
 	vec3 specularSample = getReflectionColor(R, newMaterial.roughness);
-	vec3 specularBRDF = newMaterial.rough * texture2D(u_brdf,vec2(NdotV, newMaterial.roughness)).x * texture2D(u_brdf,vec2(NdotV, newMaterial.roughness)).y ;
+	vec4 brdf =  texture2D(u_brdf,vec2(NdotV, newMaterial.roughness));
+	vec3 specularBRDF = newMaterial.rough * brdf.x + brdf.y;
 	vec3 specularIBL = specularSample * specularBRDF;
+	
 	return specularIBL;
 }
 vec3 computeDiffuseIBL(vec3 color)
 {
-	vec3 diffuseSample = getReflectionColor(N, newMaterial.metalness);
-	vec3 diffuseBRDF =  color;
+	vec3 diffuseSample = getReflectionColor(N, 1.0f);
+	vec3 diffuseBRDF =  newMaterial.metal;
 	vec3 diffuseIBL = diffuseSample * diffuseBRDF;
 	return diffuseIBL;
 }
@@ -257,23 +260,23 @@ vec3 computeDiffuseIBL(vec3 color)
 void getMaterialProperties(){
 	newMaterial.metalness = texture2D(u_texRough, uv).y ; //homogeneous vertex coordinate
 	newMaterial.roughness = texture2D(u_texRough, uv).z ;
-	vec3 color = texture2D(u_texture, uv).xyz;
+	color = texture2D(u_texture, uv);
 
 	//we compute the reflection in base to the color and the metalness
 	newMaterial.F0  = mix( vec3(0.04), color.xyz, newMaterial.metalness );
 
 	float cosTheta = max(dot(N, V),0.0);
 	newMaterial.rough =  FresnelSchlickRoughness(cosTheta, newMaterial.F0, newMaterial.roughness)*u_Rough;
+	newMaterial.metal = FresnelSchlickRoughness(cosTheta, newMaterial.F0, 1.0)*u_Metal;
 
 	//Direct light
 	vec3 specular = computeSpecularDirect();
-	vec3 diffuse  = computeDiffuseDirect(color);
+	vec3 diffuse  = computeDiffuseDirect(color.xyz);
 
 	//Indirecta
 	vec3 specularIBL = computeSpecularIBL();
-	vec3 difusseIBL = computeDiffuseIBL(color);
-	vec3 F_aux = FresnelSchlickRoughness(cosTheta, newMaterial.F0, newMaterial.metalness);
-	difusseIBL *= (1- F_aux); //Energy conservation
+	vec3 difusseIBL = computeDiffuseIBL(color.xyz);
+	difusseIBL *= (1- newMaterial.metalness); //Energy conservation
 	
 
 	float ao = texture2D(u_ao,uv).r;
@@ -284,7 +287,7 @@ void getMaterialProperties(){
 	if (u_is_ao == 1)
 		Indirect = ao * Indirect;
 	//Final -MURIPLICAR POR COLOR INTENSIDAD..
-	newMaterial.light = diffuse + specular;// + diffuse;// + Indirect;
+	newMaterial.light =  Indirect + specular + diffuse;//+ difusseIBL;
 	if (u_is_emissive == 1)
 		newMaterial.light += emissive;
 }
@@ -293,7 +296,7 @@ void getMaterialProperties(){
 
 vec4 getPixelColor()
 {
-	return vec4(newMaterial.light, 1.0f);  //color = direct + ibl
+	return vec4( newMaterial.light, 1.0f);  //color = direct + ibl
 }
 void main()
 {
@@ -306,13 +309,13 @@ void main()
 	vec3 normal = perturbNormal( N, V, uv, normal_pixel);
 	if (u_is_normal == 1)
 		N = normal;
+
 	// 2. Fill Material
 	// ...
 	getMaterialProperties();
 	
 	// 3. Shade (Direct + Indirect)
 	// ...
-
 	// 4. Apply Tonemapping
 	// ...
 
@@ -326,8 +329,8 @@ void main()
 
 	// Last step: to gamma space
 	// ...
-	vec4 color = texture2D(u_texture, uv);
-	gl_FragColor =  color * getPixelColor();
+	gl_FragColor =  getPixelColor();
+
 
 	if (u_is_opacity == 1)
 	{
