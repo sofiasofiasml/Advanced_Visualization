@@ -258,8 +258,8 @@ vec3 computeDiffuseIBL(vec3 color)
 }
 
 void getMaterialProperties(){
-	newMaterial.metalness = texture2D(u_texRough, uv).y ; //homogeneous vertex coordinate
-	newMaterial.roughness = texture2D(u_texRough, uv).z ;
+	newMaterial.metalness = texture2D(u_texRough, uv).z ; //homogeneous vertex coordinate
+	newMaterial.roughness = texture2D(u_texRough, uv).y ;
 	color = texture2D(u_texture, uv);
 
 	//we compute the reflection in base to the color and the metalness
@@ -285,9 +285,9 @@ void getMaterialProperties(){
 
 	vec3 Indirect = specularIBL + difusseIBL;
 	if (u_is_ao == 1)
-		Indirect = ao * Indirect;
+		Indirect = ao + Indirect;
 	//Final -MURIPLICAR POR COLOR INTENSIDAD..
-	newMaterial.light =  Indirect + specular + diffuse;//+ difusseIBL;
+	newMaterial.light = Indirect+ specular + diffuse;//+ difusseIBL;
 	if (u_is_emissive == 1)
 		newMaterial.light += emissive;
 }
