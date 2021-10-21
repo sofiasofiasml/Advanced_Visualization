@@ -233,8 +233,7 @@ vec3 computeDiffuseDirect(vec3 color)
 {
 	//metallic materials do not have diffuse
 	vec3 diffuse = (1-newMaterial.metalness)* color;
-	float NoL = dot(L,N);
-	diffuse = diffuse * NoL;
+	
 	return diffuse;
 }
 
@@ -268,26 +267,27 @@ void getMaterialProperties(){
 	float cosTheta = max(dot(N, V),0.0);
 	newMaterial.rough =  FresnelSchlickRoughness(cosTheta, newMaterial.F0, newMaterial.roughness)*u_Rough;
 	newMaterial.metal = FresnelSchlickRoughness(cosTheta, newMaterial.F0, 1.0)*u_Metal;
-
+	float NoL = dot(L,N);
 	//Direct light
 	vec3 specular = computeSpecularDirect();
 	vec3 diffuse  = computeDiffuseDirect(color.xyz);
 
 	//Indirecta
 	vec3 specularIBL = computeSpecularIBL();
-	vec3 difusseIBL = computeDiffuseIBL(color.xyz);
-	difusseIBL *= (1- newMaterial.metalness); //Energy conservation
+	vec3 diffuseIBL = computeDiffuseIBL(color.xyz);
+	diffuseIBL *= (1- newMaterial.metalness); //Energy conservation
 	
 
 	float ao = texture2D(u_ao,uv).r;
 	vec3 emissive = texture2D(u_emissive,uv).xyz;
 	//we could play with the curve to have more control
 
-	vec3 Indirect = specularIBL + difusseIBL;
+	vec3 Indirect = specularIBL + diffuseIBL;
+	vec3 Direct = (specular + diffuse) * NoL; 
 	if (u_is_ao == 1)
 		Indirect = ao + Indirect;
 	//Final -MURIPLICAR POR COLOR INTENSIDAD..
-	newMaterial.light = Indirect+ specular + diffuse;//+ difusseIBL;
+	newMaterial.light = Direct + diffuseIBL;//+ difusseIBL;
 	if (u_is_emissive == 1)
 		newMaterial.light += emissive;
 }
@@ -330,6 +330,8 @@ void main()
 	// Last step: to gamma space
 	// ...
 	gl_FragColor =  getPixelColor();
+	//vec3 colorfinal = toneMap(gl_FragColor.xyz);
+	//gl_FragColor = vec4(colorfinal,1.0f);
 
 
 	if (u_is_opacity == 1)
