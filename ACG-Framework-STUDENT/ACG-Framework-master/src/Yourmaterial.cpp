@@ -59,12 +59,12 @@ void yourmaterial::loadHdr()
 {
 	//We load the 3D images and the options are for the imGui
 	
-	this->hdre = HDRE::Get("data/environments/tv_studio.hdre");
+	this->hdre = HDRE::Get("data/environments/panorama.hdre");
 
 	for (int i = 0; i < LEVEL; i++)
 	{
 		this->hdr_tex[i]= new Texture();
-		this->hdr_tex[i]->cubemapFromHDRE(hdre, LEVEL);
+		this->hdr_tex[i]->cubemapFromHDRE(hdre, i);
 	}
 	
 }

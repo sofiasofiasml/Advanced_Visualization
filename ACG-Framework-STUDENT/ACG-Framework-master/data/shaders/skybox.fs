@@ -14,23 +14,18 @@ uniform vec3 u_camera_position;
 
 vec4 color; 
 vec3 light; 
+
+vec3 toneMap(vec3 color)
+{
+    return color / (color + vec3(1.0));
+}
+
 void main()
 {
 	vec2 uv = v_uv;
-	/*PHONG*/
-	vec3 N = v_normal; 
-	vec3 L = u_light_dir; 
-	/* Diffuse*/
-	float diff = max(dot(N, L), 0.0); 
-	vec3 diffuse = diff * u_light_color; 
-	/*Specular*/
-	vec3 V = normalize(u_camera_position -v_world_position); 
-	vec3 R = reflect(L, N); 
-	float spec = pow(max(dot(V,R),0.0),2); 
-	vec3 specular = spec* u_light_color; 
-
-	light =  u_ambient+ specular +diffuse;
-	color =  textureCube(u_texture,-V);
+	vec3 V = normalize(v_world_position-u_camera_position ); 
+	color =  textureCube(u_texture,V);
+    color.xyz = toneMap(color.xyz);
 	gl_FragColor = color;
 
 }

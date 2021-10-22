@@ -2,7 +2,7 @@
 #include "material.h"
 #include "texture.h"
 
-#define LEVEL 5
+#define LEVEL 6
 class yourmaterial : public StandardMaterial
 {
 public:
