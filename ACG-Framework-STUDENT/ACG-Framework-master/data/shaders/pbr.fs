@@ -177,7 +177,7 @@ void computeVectors()
 	L = normalize(u_light_dir);
 
 	V = normalize(u_camera_position - v_world_position); 
-	R = reflect(-L, N); 
+	R = normalize(reflect(-L, N)); 
 
 	H = normalize(V + L);
 	NdotV = dot(N,V);
@@ -220,19 +220,18 @@ vec3 computeSpecularDirect()
 	F = F_Schlick( LoH, newMaterial.F0 );
 
 	// Visibility Function (shadowing/masking)
-	float G = G_Smith( NoV, LoH,newMaterial.roughness);
+	float G = G_Smith( NoV, LoH, newMaterial.roughness);
 		
 	// Norm factor
 	vec3 spec = D * G * F;
-	spec /= (4.0 * NoL * NoV + 1e-6);
-	spec =  spec* NoL;
+	spec /= (4.0 * NoL * NoV + 1e-6);  //1e^-6 para que nunca de 0/0
 	return spec;
 
 }
 vec3 computeDiffuseDirect(vec3 color)
 {
 	//metallic materials do not have diffuse
-	vec3 diffuse = (1-newMaterial.metalness)* color;
+	vec3 diffuse =  color;
 	
 	return diffuse;
 }
@@ -251,8 +250,8 @@ vec3 computeSpecularIBL()
 vec3 computeDiffuseIBL(vec3 color)
 {
 	vec3 diffuseSample = getReflectionColor(N, 1.0f);
-	vec3 diffuseBRDF =  newMaterial.metal;
-	vec3 diffuseIBL = diffuseSample * diffuseBRDF;
+	vec3 diffuseBRDF =  color;
+	vec3 diffuseIBL = diffuseSample ;//* diffuseBRDF;
 	return diffuseIBL;
 }
 
@@ -275,7 +274,7 @@ void getMaterialProperties(){
 	//Indirecta
 	vec3 specularIBL = computeSpecularIBL();
 	vec3 diffuseIBL = computeDiffuseIBL(color.xyz);
-	diffuseIBL *= (1- newMaterial.metalness); //Energy conservation
+	diffuseIBL *= (1- F); //Energy conservation
 	
 
 	float ao = texture2D(u_ao,uv).r;
@@ -287,7 +286,7 @@ void getMaterialProperties(){
 	if (u_is_ao == 1)
 		Indirect = ao + Indirect;
 	//Final -MURIPLICAR POR COLOR INTENSIDAD..
-	newMaterial.light = Direct + diffuseIBL;//+ difusseIBL;
+	newMaterial.light = Direct ;//+ specularIBL;//+diffuseIBL;//+ specularIBL;//+ difusseIBL;
 	if (u_is_emissive == 1)
 		newMaterial.light += emissive;
 }

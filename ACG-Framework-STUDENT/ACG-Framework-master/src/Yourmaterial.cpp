@@ -59,7 +59,7 @@ void yourmaterial::loadHdr()
 {
 	//We load the 3D images and the options are for the imGui
 	
-	this->hdre = HDRE::Get("data/environments/studio.hdre");
+	this->hdre = HDRE::Get("data/environments/tv_studio.hdre");
 
 	for (int i = 0; i < LEVEL; i++)
 	{
