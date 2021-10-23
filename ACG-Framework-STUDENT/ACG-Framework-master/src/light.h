@@ -6,6 +6,7 @@
 
 #include "framework.h"
 #include "scenenode.h"
+#include "application.h"
 
 
 class Light : public SceneNode

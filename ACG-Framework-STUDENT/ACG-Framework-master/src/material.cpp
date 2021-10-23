@@ -18,7 +18,9 @@ void StandardMaterial::setUniforms(Camera* camera, Matrix44 model)
 {
 	Application* app = Application::instance; 
 	Light* light_dir = Application::instance->directional; 
-	yourmaterial* youMat = Application::instance->material_basic; 
+	yourmaterial* yourMat = Application::instance->material_basic;
+	yourpbr* yourPbr = Application::instance->material_pbr;
+	YourSkybox* skybox = Application::instance->skybox;
 
 	//upload node uniforms
 	shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
@@ -29,42 +31,47 @@ void StandardMaterial::setUniforms(Camera* camera, Matrix44 model)
 
 	shader->setUniform("u_color", color);
 	shader->setUniform("u_exposure", app->scene_exposure);
-	shader->setUniform("u_ambient", light_dir->ambient);
 	shader->setUniform("u_light_intensity", light_dir->intensity);
-	shader->setUniform("u_light_color", light_dir->color);
 	shader->setUniform("u_light_dir", light_dir->direction);
+
+	//phong
+	shader->setUniform("u_ambient", light_dir->ambient);
+	shader->setUniform("u_light_color", light_dir->color);
 	shader->setUniform("u_light_pos", light_dir->position);
 	shader->setUniform("u_alpha", light_dir->alpha); 
-	shader->setUniform("u_active", (float)youMat->u_active);
-	shader->setUniform("u_Metal", youMat->metal_factor);
-	shader->setUniform("u_Rough", youMat->roughness_factor);
-	shader->setUniform("u_Normal", youMat->normal_factor);
-	shader->setUniform("u_brdf", youMat->brdf_tex, 11);
-	shader->setUniform("u_opacity", youMat->opacity_tex, 12);
-	shader->setUniform1("u_is_normal", youMat->is_normal);
-	shader->setUniform1("u_is_opacity", youMat->is_opacity);
-	shader->setUniform1("u_is_ao", youMat->is_ao);
-	shader->setUniform1("u_is_emissive", youMat->is_emissive);
-	shader->setUniform("u_ao", youMat->ao_tex, 13);
-	shader->setUniform("u_emissive", youMat->emissive_tex, 14);
+	shader->setUniform1("u_active", yourMat->u_active);
+
+	//pbr
+	shader->setUniform("u_Metal", yourPbr->metal_factor);
+	shader->setUniform("u_Rough", yourPbr->roughness_factor);
+	shader->setUniform("u_Normal", yourPbr->normal_factor);
+	shader->setUniform("u_brdf", yourPbr->brdf_tex, 11);
+	shader->setUniform("u_opacity", yourPbr->opacity_tex, 12);
+	shader->setUniform1("u_is_normal", yourPbr->is_normal);
+	shader->setUniform1("u_is_opacity", yourPbr->is_opacity);
+	shader->setUniform1("u_is_ao", yourPbr->is_ao);
+	shader->setUniform1("u_is_emissive", yourPbr->is_emissive);
+	shader->setUniform("u_ao", yourPbr->ao_tex[yourMat->eTexture], 13);
+	shader->setUniform("u_emissive", yourPbr->emissive_tex, 14);
 
 
 	if (this->texture)
 		shader->setUniform("u_texture", this->texture,0);
-	if (youMat->tex_albedo && youMat->tex_metal && youMat->tex_normal && youMat->tex_rough) {
-		shader->setUniform("u_texAlbedo", youMat->tex_albedo, 1);
-		shader->setUniform("u_texMetal", youMat->tex_metal, 2);
-		shader->setUniform("u_texNormal", youMat->tex_normal, 3);
-		shader->setUniform("u_texRough", youMat->tex_rough, 4);
+
+	if (yourPbr->tex_albedo && yourPbr->tex_metal && yourPbr->tex_normal && yourPbr->tex_rough) {
+		shader->setUniform("u_texAlbedo", yourPbr->tex_albedo[yourMat->eTexture], 1);
+		shader->setUniform("u_texMetal", yourPbr->tex_metal[yourMat->eTexture], 2);
+		shader->setUniform("u_texNormal", yourPbr->tex_normal[yourMat->eTexture], 3);
+		shader->setUniform("u_texRough", yourPbr->tex_rough[yourMat->eTexture], 4);
 	}
-	if (youMat->hdr_tex) 
+	if (skybox->hdr_tex)
 	{
-		shader->setUniform("u_texture_prem", youMat->hdr_tex[0], 5);
-		shader->setUniform("u_texture_prem_0", youMat->hdr_tex[1], 6);
-		shader->setUniform("u_texture_prem_1", youMat->hdr_tex[2], 7);
-		shader->setUniform("u_texture_prem_2", youMat->hdr_tex[3], 8);
-		shader->setUniform("u_texture_prem_3", youMat->hdr_tex[4], 9);
-		shader->setUniform("u_texture_prem_4", youMat->hdr_tex[5], 10);
+		shader->setUniform("u_texture_prem", skybox->hdr_tex[0], 5);
+		shader->setUniform("u_texture_prem_0", skybox->hdr_tex[1], 6);
+		shader->setUniform("u_texture_prem_1", skybox->hdr_tex[2], 7);
+		shader->setUniform("u_texture_prem_2", skybox->hdr_tex[3], 8);
+		shader->setUniform("u_texture_prem_3", skybox->hdr_tex[4], 9);
+		shader->setUniform("u_texture_prem_4", skybox->hdr_tex[5], 10);
 
 	}
 

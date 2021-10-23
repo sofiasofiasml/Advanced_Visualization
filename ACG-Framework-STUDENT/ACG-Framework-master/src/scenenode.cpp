@@ -4,7 +4,6 @@
 #include "utils.h"
 
 unsigned int SceneNode::lastNameId = 0;
-//unsigned int mesh_selected = 0;
 
 SceneNode::SceneNode()
 {
@@ -60,7 +59,7 @@ void SceneNode::renderInMenu()
 	if (mesh && ImGui::TreeNode("Geometry"))
 	{
 		bool changed = false;
-		changed |= ImGui::Combo("Mesh", (int*)&mesh_selected, "HELMET\0BALL\0BENCH\0");
+		changed |= ImGui::Combo("Mesh", (int*)&mesh_selected, "HELMET\0LANTERN\0BALL\0");
 
 		ImGui::TreePop();
 	}

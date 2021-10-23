@@ -11,11 +11,12 @@ uniform vec3 u_light_color;
 uniform vec3 u_light_dir;
 uniform vec3 u_light_pos;
 uniform vec3 u_camera_position;
-uniform samplerCube u_skybox;
-uniform sampler2D u_texture;
-uniform float u_active; 
-vec4 color; 
+uniform sampler2D u_texAlbedo;
+uniform int u_active; 
+
+vec3 color; 
 vec3 light; 
+
 void main()
 {
 	vec2 uv = v_uv;
@@ -33,11 +34,11 @@ void main()
 
 	
 	light =  u_ambient+ specular +diffuse;
-	 	
+	color =  light*u_light_intensity;
 
-	if(u_active==0.0){color =   vec4(light,1.0)*u_light_intensity;}
-	else{color =  vec4(light,1.0)*u_light_intensity*texture2D(u_texture, uv );}
+	if(u_active==1.0)
+		color *= texture2D(u_texAlbedo, uv ).xyz;
 	
-	gl_FragColor = color;
+	gl_FragColor = vec4(color,1.0f);
 
 }

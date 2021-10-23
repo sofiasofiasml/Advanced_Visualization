@@ -114,9 +114,16 @@ void renderGUI(SDL_Window* window, Application * game)
 			game->material_basic->renderInMenu();
 			ImGui::TreePop();
 		}
-		if (ImGui::TreeNode("Light")) {
-			game->directional->renderInMenu();
+		if (ImGui::TreeNode("PBR")) {
+			game->material_pbr->renderInMenu();
 			ImGui::TreePop();
+		}
+		if (Application::instance->material_basic->eMaterial == Application::instance->material_basic->PHONG ||
+			Application::instance->material_basic->eMaterial == Application::instance->material_basic->PBR) {
+			if (ImGui::TreeNode("Light")) {
+				game->directional->renderInMenu();
+				ImGui::TreePop();
+			}
 		}
 		if (ImGui::TreeNode("Skybox")) {
 			game->skybox->renderInMenu();

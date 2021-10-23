@@ -35,7 +35,8 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 	output = 0;
 
 	// OpenGL flags
-	glEnable( GL_CULL_FACE ); //render both sides of every triangle
+	glEnable(GL_CULL_FACE); //render both sides of every triangle
+	/*glCullFace(GL_FRONT_SIDE);*/
 	glEnable( GL_DEPTH_TEST ); //check the occlusions using the Z buffer
 
 	// Create camera
@@ -44,6 +45,7 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 	camera->setPerspective(45.f,window_width/(float)window_height,0.1f,10000.f); //set the projection, we want to be perspective
 
 	material_basic = new yourmaterial();
+	material_pbr = new yourpbr();
 	{
 		StandardMaterial* mat = new StandardMaterial();
 		SceneNode* node = new SceneNode("Visible node");
@@ -52,20 +54,28 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 		//Mesh
 		material_basic->meshSphere = Mesh::Get("data/meshes/sphere.obj");
 		material_basic->meshHelmet = Mesh::Get("data/models/helmet/helmet.obj");
-		material_basic->meshBench = Mesh::Get("data/models/lantern/lantern.obj");
-
+		material_basic->meshLantern = Mesh::Get("data/models/lantern/lantern.obj");
+		
 		//Textures
-		material_basic->text_helmet = Texture::Get("data/models/helmet/albedo.tga");
-		material_basic->text_ball = Texture::Get("data/models/ball/albedo.tga");
-		material_basic->text_bench = Texture::Get("data/models/lantern/albedo.tga");
-		material_basic->tex_albedo = material_basic->text_bench; // cubemap in shader 
-		material_basic->tex_normal = Texture::Get("data/models/helmet/normal.tga");
-		material_basic->tex_metal = Texture::Get("data/models/helmet/metalness.tga");
-		material_basic->tex_rough = Texture::Get("data/models/helmet/roughness.tga");
-		material_basic->brdf_tex = Texture::Get("data/brdfLUT.png");
-		material_basic->opacity_tex = Texture::Get("data/models/helmet/opacity.tga");
-		material_basic->opacity_tex = Texture::Get("data/models/helmet/ao.tga");
-		material_basic->emissive_tex = Texture::Get("data/models/helmet/emissive.tga");
+		//helmet
+		material_pbr->tex_albedo[0] = Texture::Get("data/models/helmet/albedo.tga");
+		material_pbr->tex_normal[0] = Texture::Get("data/models/helmet/normal.tga");
+		material_pbr->tex_metal[0] = Texture::Get("data/models/helmet/metalness.tga");
+		material_pbr->tex_rough[0] = Texture::Get("data/models/helmet/roughness.tga");
+		material_pbr->ao_tex[0] = Texture::Get("data/models/helmet/ao.tga");
+		material_pbr->emissive_tex = Texture::Get("data/models/helmet/emissive.tga");
+
+		//lantern
+		material_pbr->tex_albedo[1] = Texture::Get("data/models/lantern/albedo.tga");
+		material_pbr->tex_normal[1] = Texture::Get("data/models/lantern/normal.tga");
+		material_pbr->tex_metal[1] = Texture::Get("data/models/lantern/metalness.tga");
+		material_pbr->tex_rough[1] = Texture::Get("data/models/lantern/roughness.tga");
+		material_pbr->ao_tex[1] = Texture::Get("data/models/lantern/ao.tga");
+		material_pbr->opacity_tex = Texture::Get("data/models/lantern/opacity.tga");
+		material_pbr->brdf_tex = Texture::Get("data/brdfLUT.png");
+
+		//ball
+		material_pbr->tex_albedo[2] = Texture::Get("data/models/ball/albedo.tga");
 
 		//Shaders
 		material_basic->shader_flat = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");
@@ -73,7 +83,7 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 		material_basic->shader_reflective = Shader::Get("data/shaders/basic.vs", "data/shaders/reflective.fs");
 		material_basic->shader_pbr = Shader::Get("data/shaders/basic.vs", "data/shaders/pbr.fs");
 		
-		node->material->texture = material_basic->text_helmet; // sample2d in shader
+		node->material->texture = material_pbr->tex_albedo[0]; // sample2d in shader
 		node->mesh = material_basic->meshHelmet;
 		node->model.translate(0, 1, 0);
 		//node->model.scale(0.02, 0.02, 0.02);
@@ -98,8 +108,10 @@ void Application::render(void)
 	//set the camera as default
 	camera->enable();
 	
+
 	//Skybox
 	Matrix44 skybox_model; 
+
 	skybox_model.translate(camera->eye.x, camera->eye.y, camera->eye.z);
 	glDisable(GL_DEPTH_TEST); 
 	skybox->material->render(skybox->mesh, skybox_model, camera); 
@@ -114,6 +126,9 @@ void Application::render(void)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	for (size_t i = 0; i < node_list.size(); i++) {
+		Matrix44 model;
+		model.translate(0, 1, 0);
+
 		if (material_basic->eMaterial == material_basic->TEXTURE)
 			node_list[i]->material->shader = material_basic->shader_flat;
 		else if (material_basic->eMaterial == material_basic->PHONG)
@@ -130,18 +145,17 @@ void Application::render(void)
 		//We change the mesh if we change the imGui options
 		if (node_list[i]->mesh_selected == 0)
 			node_list[i]->mesh = material_basic->meshHelmet;
-		else if (node_list[i]->mesh_selected == 1)
-			node_list[i]->mesh = material_basic->meshSphere;
+		else if (node_list[i]->mesh_selected == 1) {
+			node_list[i]->mesh = material_basic->meshLantern;
+			model.scale(0.02, 0.02, 0.02);
+		}
 		else if (node_list[i]->mesh_selected == 2)
-			node_list[i]->mesh = material_basic->meshBench;
+			node_list[i]->mesh = material_basic->meshSphere;
 
 		//We change the texture if we change the imGui options
-		if (material_basic->eTexture == 0)
-			node_list[i]->material->texture = material_basic->text_helmet;
-		else if (material_basic->eTexture == 1)
-			node_list[i]->material->texture = material_basic->text_ball;
-		else if (material_basic->eTexture == 2) //lantern
-			node_list[i]->material->texture = material_basic->text_bench;
+		node_list[i]->material->texture = material_pbr->tex_albedo[material_basic->eTexture];
+		node_list[i]->model = model;
+
 	}
 	glDisable(GL_BLEND);
 

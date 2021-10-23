@@ -1,5 +1,6 @@
 #define PI 3.14159265359
 #define RECIPROCAL_PI 0.3183098861837697
+
 uniform samplerCube u_texture_prem;
 uniform samplerCube u_texture_prem_0;
 uniform samplerCube u_texture_prem_1;
@@ -20,8 +21,6 @@ uniform vec3 u_light_color;
 uniform vec3 u_light_dir;
 uniform vec3 u_light_pos;
 uniform vec3 u_camera_position;
-uniform samplerCube u_skybox;
-uniform sampler2D u_texture;
 uniform float u_active; 
 uniform float u_Metal; 
 uniform float u_Rough; 
@@ -29,7 +28,7 @@ uniform float u_Normal;
 vec4 color; 
 vec3 light; 
 
-uniform sampler2D u_texAlbedo; 
+uniform sampler2D u_texAlbedo;
 uniform sampler2D u_texMetal; 
 uniform sampler2D u_texNormal;
 uniform sampler2D u_texRough; 
@@ -50,11 +49,16 @@ vec3 L;
 vec3 V; 
 vec3 R; 
 vec3 H; 
+vec3 F;
+
 vec2 uv;
-float NdotV ; 
+
+float NdotV;
+float NdotH;
+float LdotH;
+float NdotL;
 const float GAMMA = 2.2;
 const float INV_GAMMA = 1.0 / GAMMA;
-vec3 F;
 
 struct PBRMatStruct
 {
@@ -171,16 +175,19 @@ vec3 toneMapUncharted(vec3 color)
 
 void computeVectors()
 {
-	newMaterial.F0 = vec3(0); 
-
+	newMaterial.F0 = vec3(0);
 	N = normalize(v_normal); 
 	L = normalize(u_light_dir);
 
 	V = normalize(u_camera_position - v_world_position); 
-	R = normalize(reflect(-L, N)); 
+	R = normalize(reflect(-V, N)); 
 
 	H = normalize(V + L);
+
 	NdotV = dot(N,V);
+	NdotH = dot(N,H);
+	LdotH = dot(L,H);
+	NdotL = dot(L,N);
 }
 // Normal Distribution Function using GGX Distribution
 float D_GGX (const in float NoH, const in float linearRoughness )
@@ -209,22 +216,19 @@ float G_Smith( float NdotV, float NdotL, float roughness)
 vec3 computeSpecularDirect()
 {
 	float a = newMaterial.roughness * newMaterial.roughness;
-	float NoH = dot(N,H);
 
 	// Normal Distribution Function
-	float D = D_GGX( NoH, a );
-	float LoH = dot(L,H);
-	float NoL = dot(L,N);
-	float NoV = dot(V,N);
+	float D = D_GGX( NdotH, a );
+	
 	// Fresnel Function
-	F = F_Schlick( LoH, newMaterial.F0 );
+	F = F_Schlick( LdotH, newMaterial.F0 );
 
 	// Visibility Function (shadowing/masking)
-	float G = G_Smith( NoV, LoH, newMaterial.roughness);
+	float G = G_Smith( NdotV, LdotH, newMaterial.roughness);
 		
 	// Norm factor
 	vec3 spec = D * G * F;
-	spec /= (4.0 * NoL * NoV + 1e-6);  //1e^-6 para que nunca de 0/0
+	spec /= (4.0 * NdotL * NdotV + 1e-6);  //1e^-6 para que nunca de 0/0
 	return spec;
 
 }
@@ -232,18 +236,16 @@ vec3 computeDiffuseDirect(vec3 color)
 {
 	//metallic materials do not have diffuse
 	vec3 diffuse =  color;
-	
 	return diffuse;
 }
 
 //IBL
 vec3 computeSpecularIBL()
 {
-	float NoV = dot(V,N);
 	vec3 specularSample = getReflectionColor(R, newMaterial.roughness);
-	vec4 brdf =  texture2D(u_brdf,vec2(NdotV, newMaterial.roughness));
-	vec3 specularBRDF =  newMaterial.rough  * brdf.x + brdf.y;
-	vec3 specularIBL = specularBRDF * specularSample;
+	vec2 brdf =  texture2D(u_brdf,vec2(NdotV, pow(newMaterial.roughness,2))).xy;
+	vec3 specularBRDF =  newMaterial.rough * brdf.x + brdf.y;
+	vec3 specularIBL = specularSample* specularBRDF ;
 	return specularIBL;
 }
 vec3 computeDiffuseIBL(vec3 color)
@@ -255,43 +257,50 @@ vec3 computeDiffuseIBL(vec3 color)
 }
 
 void getMaterialProperties(){
-	newMaterial.metalness = texture2D(u_texRough, uv).z; //homogeneous vertex coordinate
-	newMaterial.roughness = texture2D(u_texRough, uv).y;
-	color = texture2D(u_texture, uv);
+	newMaterial.metalness = texture2D(u_texRough, uv).z * u_Metal; //homogeneous vertex coordinate
+	newMaterial.roughness = texture2D(u_texRough, uv).y * u_Rough;
+	color = texture2D(u_texAlbedo, uv);
 
 	//we compute the reflection in base to the color and the metalness
-	newMaterial.F0  = mix(vec3(0.04),color.xyz, newMaterial.metalness );
-	float cosTheta = max(dot(N, V),0.0);
-	newMaterial.rough =  FresnelSchlickRoughness(cosTheta, newMaterial.F0, newMaterial.roughness)*u_Rough;
-	float NoL = dot(L,N);
+	newMaterial.F0  = mix(vec3(0.04),color.xyz, newMaterial.metalness);
+	float cosTheta = max(NdotV,0.0);
+	newMaterial.rough =  FresnelSchlickRoughness(cosTheta, newMaterial.F0, newMaterial.roughness);
+	
 	//Direct light
 	vec3 specular = computeSpecularDirect();
 	vec3 diffuse  = computeDiffuseDirect(color.xyz);
 	diffuse *= (1- newMaterial.metalness);		
+
 	//Indirecta
 	vec3 specularIBL = computeSpecularIBL();
 	vec3 diffuseIBL = computeDiffuseIBL(color.xyz);
-	//diffuseIBL *= (1- newMaterial.rough); //Energy conservation
+	diffuseIBL *= (1- newMaterial.rough); //Energy conservation
 	
-
-	float ao = texture2D(u_ao,uv).r;
-	vec3 emissive = texture2D(u_emissive,uv).xyz;
-	//we could play with the curve to have more control
-
+	//Final light
 	vec3 Indirect = specularIBL + diffuseIBL;
-	vec3 Direct = (specular + diffuse) * NoL; 
-	if (u_is_ao == 1)
-		Indirect = ao + Indirect;
-	//Final -MURIPLICAR POR COLOR INTENSIDAD..
-	newMaterial.light =  Direct + Indirect ;//+ diffuseIBL;//+ specularIBL;//+diffuseIBL;//+ specularIBL;//+ difusseIBL;
-	if (u_is_emissive == 1)
-		newMaterial.light += emissive;
+	vec3 Direct = (specular + diffuse) * NdotL; 
+
+	if (u_is_ao == 1){
+		float ao_factor = texture2D(u_ao,uv).r;
+
+		//we could play with the curve to have more control
+		ao_factor = pow( ao_factor, 3.0 );
+		Indirect *= ao_factor;
+	}
+
+	newMaterial.light =  Direct + Indirect;
+	newMaterial.light *= u_light_intensity;
+
 }
 //get diffuse and specular terms from direct lighting
 //get diffuse and specular terms from IBL
 
 vec4 getPixelColor()
 {
+	vec3 emissive = texture2D(u_emissive,uv).xyz;
+	
+	if (u_is_emissive == 1)
+		newMaterial.light += emissive;
 	return vec4( newMaterial.light, 1.0f);  //color = direct + ibl
 }
 void main()
@@ -304,7 +313,7 @@ void main()
 	vec3 normal_pixel = texture2D(u_texNormal,uv).xyz;
 	vec3 normal = perturbNormal( N, V, uv, normal_pixel);
 	if (u_is_normal == 1)
-		N = normal;
+		N = normal + N;
 
 	// 2. Fill Material
 	// ...
@@ -312,25 +321,26 @@ void main()
 	
 	// 3. Shade (Direct + Indirect)
 	// ...
+	vec4 colorfinal =  getPixelColor();
+
 	// 4. Apply Tonemapping
 	// ...
+	colorfinal.xyz = toneMap(colorfinal.xyz);
 
 	// 5. Any extra texture to apply after tonemapping
 	// ...
-	float opacity = texture2D(u_opacity,uv).r;
-	
-	// Last step: to gamma space
-	// ...
-	vec4 colorfinal =  getPixelColor();
-	//colorfinal.xyz = toneMap(colorfinal.xyz);
-	//colorfinal.xyz = linear_to_gamma(colorfinal.xyz);
 	gl_FragColor = vec4(colorfinal);
 
 	if (u_is_opacity == 1)
-	{
+	{	
+		float opacity = texture2D(u_opacity,uv).r;
 		if(opacity != 1) //no acabado
 			gl_FragColor.a = opacity;
 	}
+	// Last step: to gamma space
+	// ...
+	//gl_FragColor.xyz = linear_to_gamma(gl_FragColor.xyz);
+	
 		
 
 }

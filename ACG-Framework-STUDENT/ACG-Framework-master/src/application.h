@@ -12,6 +12,7 @@
 #include "Light.h"
 #include "Skybox.h"
 #include "yourmaterial.h"
+#include "yourpbr.h"
 
 
 enum EOutput {
@@ -55,6 +56,8 @@ public:
 	YourSkybox* skybox; 
 
 	yourmaterial* material_basic;
+
+	yourpbr* material_pbr;
 
 
 	Application( int window_width, int window_height, SDL_Window* window );

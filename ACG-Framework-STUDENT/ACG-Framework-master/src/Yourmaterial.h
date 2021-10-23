@@ -2,14 +2,13 @@
 #include "material.h"
 #include "texture.h"
 
-#define LEVEL 6
 class yourmaterial : public StandardMaterial
 {
 public:
 	enum shaders { TEXTURE, PHONG, REFLECTIVE, PBR};
 	shaders eMaterial;
 
-	enum tex_material {HELMET, BALL, BENCH}; 
+	enum tex_material {HELMET, LANTERN, BALL };
 	tex_material eTexture; 
 	
 	//Textures
@@ -17,37 +16,10 @@ public:
 	Texture* text_ball = new Texture();
 	Texture* text_bench = new Texture();
 
-	//Material Texture PBR
-	Texture* tex_albedo;
-	Texture* tex_normal;
-	Texture* tex_rough;
-	Texture* tex_metal;
-
-	Texture* brdf_tex;
-	Texture* ao_tex;
-	Texture* opacity_tex;
-	Texture* emissive_tex;
-
-	int is_normal;
-	int is_opacity;
-	int is_ao;
-	int is_emissive;
-	//
-
-	Texture* hdr_tex[LEVEL];
-
-	HDRE* hdre;
-
-
-	//Factors PBR
-	float roughness_factor; 
-	float metal_factor; 
-	float normal_factor; 
-
 	//Mesh
 	Mesh* meshHelmet = NULL;
 	Mesh* meshSphere = NULL;
-	Mesh* meshBench = NULL;
+	Mesh* meshLantern = NULL;
 	
 	// Shader
 	Shader* shader_flat = NULL;
@@ -56,10 +28,9 @@ public:
 	Shader* shader_pbr = NULL;
 
 	//Var for the imGui options
-	float u_active; 
-	bool active_bool; 
+	int u_active;
 
 	yourmaterial();
 	void renderInMenu();
-	void loadHdr();
+	
 };
