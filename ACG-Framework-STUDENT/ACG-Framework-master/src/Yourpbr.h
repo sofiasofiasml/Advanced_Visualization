@@ -29,5 +29,6 @@ public:
 	float normal_factor;
 
 	yourpbr();
+	void reset();
 	void renderInMenu();
 };

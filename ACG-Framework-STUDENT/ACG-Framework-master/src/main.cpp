@@ -99,9 +99,9 @@ void renderGUI(SDL_Window* window, Application * game)
 
 		//System stats
 		ImGui::Text(getGPUStats().c_str());					   // Display some text (you can use a format strings too)
-		
+
 		if (ImGui::TreeNode("Scene")) {
-			ImGui::DragFloat("Exposure", &Application::instance->scene_exposure, 0.01f,-2, 2);
+			ImGui::DragFloat("Exposure", &Application::instance->scene_exposure, 0.01f, -2, 2);
 			ImGui::Combo("Output", &Application::instance->output, "COMPLETE\0ALBEDO\0ROUGHNESS\0\METALNESS\0NORMALS\0");
 			ImGui::TreePop();
 		}
@@ -114,9 +114,11 @@ void renderGUI(SDL_Window* window, Application * game)
 			game->material_basic->renderInMenu();
 			ImGui::TreePop();
 		}
-		if (ImGui::TreeNode("PBR")) {
-			game->material_pbr->renderInMenu();
-			ImGui::TreePop();
+		if (Application::instance->material_basic->eMaterial == Application::instance->material_basic->PBR){
+			if (ImGui::TreeNode("PBR")) {
+				game->material_pbr->renderInMenu();
+					ImGui::TreePop();
+			}
 		}
 		if (Application::instance->material_basic->eMaterial == Application::instance->material_basic->PHONG ||
 			Application::instance->material_basic->eMaterial == Application::instance->material_basic->PBR) {

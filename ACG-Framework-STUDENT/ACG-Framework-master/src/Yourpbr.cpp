@@ -13,12 +13,20 @@ yourpbr::yourpbr()
 	this->roughness_factor = 1.0f;
 	this->metal_factor = 1.0f;
 	this->normal_factor = 1.0f;
-
-
 }
 
+void yourpbr::reset()
+{
+	this->is_normal = 0;
+	this->is_opacity = 0;
+	this->is_ao = 0;
+	this->is_emissive = 0;
 
 
+	this->roughness_factor = 1.0f;
+	this->metal_factor = 1.0f;
+	this->normal_factor = 1.0f;
+}
 
 void yourpbr::renderInMenu()
 {
