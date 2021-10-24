@@ -42,6 +42,7 @@ uniform int u_is_normal;
 uniform int u_is_opacity;
 uniform int u_is_ao;
 uniform int u_is_emissive;
+uniform int u_is_helmet;
 
 vec3 L; 
 vec3 N; 
@@ -260,8 +261,15 @@ vec3 computeDiffuseIBL(vec3 color)
 }
 
 void getMaterialProperties(){
-	newMaterial.metalness = texture2D(u_texRough, uv).z * u_Metal; //homogeneous vertex coordinate
-	newMaterial.roughness = texture2D(u_texRough, uv).y * u_Rough;
+	if(u_is_helmet == 0){
+		newMaterial.metalness = texture2D(u_texRough, uv).z * u_Metal; //homogeneous vertex coordinate
+		newMaterial.roughness = texture2D(u_texRough, uv).y * u_Rough;
+	}
+	else{
+		newMaterial.metalness = texture2D(u_texMetal, uv).z * u_Metal; //homogeneous vertex coordinate
+		newMaterial.roughness = texture2D(u_texRough, uv).y * u_Rough;
+	}
+	
 
 	//we compute the reflection in base to the color and the metalness
 	newMaterial.F0S  = mix(vec3(0.04),color.xyz, newMaterial.metalness);

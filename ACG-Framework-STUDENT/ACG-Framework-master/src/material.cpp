@@ -48,6 +48,8 @@ void StandardMaterial::setUniforms(Camera* camera, Matrix44 model)
 	shader->setUniform("u_brdf", yourPbr->brdf_tex, 11);
 	shader->setUniform("u_opacity", yourPbr->opacity_tex, 12);
 	shader->setUniform1("u_is_normal", yourPbr->is_normal);
+	shader->setUniform1("u_is_helmet", yourMat->eTexture);
+	
 	shader->setUniform1("u_is_opacity", yourPbr->is_opacity);
 	shader->setUniform1("u_is_ao", yourPbr->is_ao);
 	shader->setUniform1("u_is_emissive", yourPbr->is_emissive);
