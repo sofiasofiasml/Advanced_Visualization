@@ -29,6 +29,7 @@ vec4 color;
 vec3 light; 
 
 uniform sampler2D u_texAlbedo;
+uniform sampler2D u_texDepth;
 uniform sampler2D u_texMetal; 
 uniform sampler2D u_texNormal;
 uniform sampler2D u_texRough; 
@@ -43,6 +44,8 @@ uniform int u_is_opacity;
 uniform int u_is_ao;
 uniform int u_is_emissive;
 uniform int u_is_helmet;
+uniform int u_is_dispacement;
+uniform float height_scale; 
 
 vec3 L; 
 vec3 N; 
@@ -58,6 +61,7 @@ float NdotH;
 float LdotH;
 float NdotL;
 
+vec2 uv_diplace; 
 const float GAMMA = 2.2;
 const float INV_GAMMA = 1.0 / GAMMA;
 
@@ -76,6 +80,46 @@ struct PBRMatStruct
 	vec3 DifussedDirect;
 
 }newMaterial;
+
+//desplacement map
+vec2 ParallaxMapping(vec2 texCoords)
+{ 
+    const float minLayers = 8.0;
+	const float maxLayers = 32.0;
+	float numLayers = mix(maxLayers, minLayers, max(dot(vec3(0.0, 0.0, 1.0), V), 0.0));  
+    // calculate the size of each layer
+    float layerDepth = 1.0 / numLayers;
+    // depth of current layer
+    float currentLayerDepth = 0.0;
+    // the amount to shift the texture coordinates per layer (from vector P)
+    vec2 P = V.xy * height_scale; 
+    vec2 deltaTexCoords = P / numLayers;
+	vec2  currentTexCoords     = texCoords;
+	float currentDepthMapValue = texture2D(u_texNormal, currentTexCoords).b;
+  
+	while(currentLayerDepth < currentDepthMapValue)
+	{
+		// shift texture coordinates along direction of P
+		currentTexCoords -= deltaTexCoords;
+		// get depthmap value at current texture coordinates
+		currentDepthMapValue = texture2D(u_texNormal, currentTexCoords).b;  
+		// get depth of next layer
+		currentLayerDepth += layerDepth;  
+	}
+	// get texture coordinates before collision (reverse operations)
+	vec2 prevTexCoords = currentTexCoords + deltaTexCoords;
+
+	// get depth after and before collision for linear interpolation
+	float afterDepth  = currentDepthMapValue - currentLayerDepth;
+	float beforeDepth =texture2D(u_texNormal, currentTexCoords).b - currentLayerDepth + layerDepth;
+ 
+	// interpolation of texture coordinates
+	float weight = afterDepth / (afterDepth - beforeDepth);
+	vec2 finalTexCoords = prevTexCoords * weight + currentTexCoords * (1.0 - weight);
+
+	return finalTexCoords; 
+	
+} 
 
 // degamma
 vec3 gamma_to_linear(vec3 color)
@@ -318,22 +362,29 @@ void main()
 	newMaterial;
 	uv = v_uv;
 	computeVectors(); 
-
+	//displacement map
+	uv_diplace = uv; 
+	if(u_is_dispacement ==1){
+		uv_diplace= ParallaxMapping(uv); 
+		if(uv_diplace.x > 1.0 || uv_diplace.y > 1.0 || uv_diplace.x < 0.0 || uv_diplace.y < 0.0)
+			uv_diplace = uv;
+	}
+	
+			
 	//normal
-	vec3 normal_pixel = texture2D(u_texNormal,uv).xyz;
-	vec3 normal = perturbNormal( N, V, uv, normal_pixel);
+	vec3 normal_pixel = texture2D(u_texNormal,uv_diplace).xyz;
+	vec3 normal = perturbNormal( N, V, uv_diplace, normal_pixel);
 	if (u_is_normal == 1)
 		N = normal;
 
 	//degamma emissive and albedo
 	emissive = texture2D(u_emissive,uv).xyz;
-	color = texture2D(u_texAlbedo, uv);
+	color = texture2D(u_texAlbedo, uv_diplace);
 	color.xyz = gamma_to_linear(color.xyz);
 	emissive.xyz = gamma_to_linear(emissive.xyz);
 
 	// 2. Fill Material
 	getMaterialProperties();
-	
 	// 3. Shade (Direct + Indirect)
 	vec4 colorfinal =  getPixelColor();
 

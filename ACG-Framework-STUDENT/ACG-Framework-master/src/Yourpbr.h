@@ -23,10 +23,12 @@ public:
 	int is_opacity;
 	int is_ao;
 	int is_emissive;
+	int is_displacement; 
 
 	float roughness_factor;
 	float metal_factor;
-	float normal_factor;
+	float desplacement_factor;
+	float normal_factor; 
 
 	yourpbr();
 	void reset();

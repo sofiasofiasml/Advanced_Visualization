@@ -65,6 +65,7 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 		material_pbr->ao_tex[0] = Texture::Get("data/models/helmet/ao.tga");
 		material_pbr->emissive_tex = Texture::Get("data/models/helmet/emissive.tga");
 
+
 		//lantern
 		material_pbr->tex_albedo[1] = Texture::Get("data/models/lantern/albedo.tga");
 		material_pbr->tex_normal[1] = Texture::Get("data/models/lantern/normal.tga");
