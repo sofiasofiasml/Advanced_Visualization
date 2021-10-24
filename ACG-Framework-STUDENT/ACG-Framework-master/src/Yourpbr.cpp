@@ -10,7 +10,7 @@ yourpbr::yourpbr()
 	this->is_emissive = 0;
 	this->is_displacement = 0;
 
-	this->desplacement_factor = 0.02f; 
+	this->desplacement_factor = 1.0f; 
 	this->roughness_factor = 1.0f;
 	this->metal_factor = 1.0f;
 	this->normal_factor = 1.0f;
@@ -37,7 +37,7 @@ void yourpbr::renderInMenu()
 	if (youmat->eMaterial == youmat->PBR)
 	{
 		ImGui::DragFloat("Metalness", &this->metal_factor, 0.01f, 0, 1.0f);
-		ImGui::DragFloat("Desplacement", &this->desplacement_factor, 0.01f, 0, 1.0f);
+		ImGui::DragFloat("Desplacement", &this->desplacement_factor, 0.01f, 0, 127.0f);
 		ImGui::DragFloat("Roughness", &this->roughness_factor, 0.01f, 0, 1.0f);
 		ImGui::DragFloat("Normal", &this->normal_factor, 0.01f, 0, 1.0f);
 		ImGui::Checkbox("Show Normals", (bool*)&this->is_normal);

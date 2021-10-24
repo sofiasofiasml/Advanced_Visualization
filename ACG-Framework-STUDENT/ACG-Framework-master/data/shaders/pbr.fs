@@ -84,41 +84,12 @@ struct PBRMatStruct
 //desplacement map
 vec2 ParallaxMapping(vec2 texCoords)
 { 
-    const float minLayers = 8.0;
-	const float maxLayers = 32.0;
-	float numLayers = mix(maxLayers, minLayers, max(dot(vec3(0.0, 0.0, 1.0), V), 0.0));  
-    // calculate the size of each layer
-    float layerDepth = 1.0 / numLayers;
-    // depth of current layer
-    float currentLayerDepth = 0.0;
-    // the amount to shift the texture coordinates per layer (from vector P)
-    vec2 P = V.xy * height_scale; 
-    vec2 deltaTexCoords = P / numLayers;
-	vec2  currentTexCoords     = texCoords;
-	float currentDepthMapValue = texture2D(u_texNormal, currentTexCoords).b;
-  
-	while(currentLayerDepth < currentDepthMapValue)
-	{
-		// shift texture coordinates along direction of P
-		currentTexCoords -= deltaTexCoords;
-		// get depthmap value at current texture coordinates
-		currentDepthMapValue = texture2D(u_texNormal, currentTexCoords).b;  
-		// get depth of next layer
-		currentLayerDepth += layerDepth;  
-	}
-	// get texture coordinates before collision (reverse operations)
-	vec2 prevTexCoords = currentTexCoords + deltaTexCoords;
+	float height = texture2D(u_texNormal, vec2 (uv.x, uv.y)).b; 
+	 vec2 scaleBias = vec2(height_scale); 
+	 float v = height * scaleBias.r - scaleBias.g; 
+	 vec2 newCoords = uv + (normalize(V.xy) * v); 
 
-	// get depth after and before collision for linear interpolation
-	float afterDepth  = currentDepthMapValue - currentLayerDepth;
-	float beforeDepth =texture2D(u_texNormal, currentTexCoords).b - currentLayerDepth + layerDepth;
- 
-	// interpolation of texture coordinates
-	float weight = afterDepth / (afterDepth - beforeDepth);
-	vec2 finalTexCoords = prevTexCoords * weight + currentTexCoords * (1.0 - weight);
-
-	return finalTexCoords; 
-	
+	return newCoords; 
 } 
 
 // degamma
