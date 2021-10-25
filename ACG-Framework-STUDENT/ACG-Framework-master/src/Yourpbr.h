@@ -9,10 +9,10 @@ class yourpbr : public StandardMaterial
 public:
 
 	Texture* tex_albedo[3];
-	Texture* tex_normal[2];
-	Texture* tex_rough[2];
-	Texture* tex_metal[2];
-	Texture* ao_tex[2];
+	Texture* tex_normal[3];
+	Texture* tex_rough[3];
+	Texture* tex_metal[3];
+	Texture* ao_tex[3];
 
 	//only one texture
 	Texture* brdf_tex;

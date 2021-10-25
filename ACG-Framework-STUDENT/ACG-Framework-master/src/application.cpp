@@ -77,6 +77,10 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 
 		//ball
 		material_pbr->tex_albedo[2] = Texture::Get("data/models/ball/albedo.tga");
+		material_pbr->tex_rough[2] = Texture::Get("data/models/ball/roughness.tga");
+		material_pbr->tex_metal[2] = Texture::Get("data/models/ball/metalness.tga");
+		material_pbr->tex_normal[2] = Texture::Get("data/models/ball/normal.tga");
+
 
 		//Shaders
 		material_basic->shader_flat = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");
@@ -116,14 +120,14 @@ void Application::render(void)
 	skybox_model.translate(camera->eye.x, camera->eye.y, camera->eye.z);
 	glDisable(GL_DEPTH_TEST); 
 	skybox->material->render(skybox->mesh, skybox_model, camera); 
-	glEnable(GL_DEPTH_TEST); 
 	if(skybox->now_sky != skybox->before_sky)
 		skybox->loadCubemap();
 	
 	//set flags
 	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
+
+	glDisable(GL_CULL_FACE);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	for (size_t i = 0; i < node_list.size(); i++) {

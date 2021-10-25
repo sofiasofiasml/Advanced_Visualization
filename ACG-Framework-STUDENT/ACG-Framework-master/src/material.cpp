@@ -2,7 +2,7 @@
 #include "texture.h"
 #include "application.h"
 #include "extra/hdre.h"
-
+using namespace std;
 StandardMaterial::StandardMaterial()
 {
 	color = vec4(1.f, 1.f, 1.f, 1.f);
@@ -62,12 +62,12 @@ void StandardMaterial::setUniforms(Camera* camera, Matrix44 model)
 	if (this->texture)
 		shader->setUniform("u_texture", this->texture,0);
 
-	if (yourPbr->tex_albedo && yourPbr->tex_metal && yourPbr->tex_normal && yourPbr->tex_rough) {
+	//if (yourPbr->tex_albedo && yourPbr->tex_metal && yourPbr->tex_normal && yourPbr->tex_rough) {
 		shader->setUniform("u_texAlbedo", yourPbr->tex_albedo[yourMat->eTexture], 1);
 		shader->setUniform("u_texMetal", yourPbr->tex_metal[yourMat->eTexture], 2);
 		shader->setUniform("u_texNormal", yourPbr->tex_normal[yourMat->eTexture], 3);
 		shader->setUniform("u_texRough", yourPbr->tex_rough[yourMat->eTexture], 4);
-	}
+	//}
 	if (skybox->hdr_tex)
 	{
 		shader->setUniform("u_texture_prem", skybox->hdr_tex[0], 5);
@@ -76,7 +76,6 @@ void StandardMaterial::setUniforms(Camera* camera, Matrix44 model)
 		shader->setUniform("u_texture_prem_2", skybox->hdr_tex[3], 8);
 		shader->setUniform("u_texture_prem_3", skybox->hdr_tex[4], 9);
 		shader->setUniform("u_texture_prem_4", skybox->hdr_tex[5], 10);
-
 	}
 
 }

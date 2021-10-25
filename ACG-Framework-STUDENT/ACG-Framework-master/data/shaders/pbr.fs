@@ -239,7 +239,7 @@ vec3 computeSpecularDirect()
 	float D = D_GGX( NdotH, a );
 	
 	// Fresnel Function
-	F = F_Schlick( LdotH, newMaterial.F0S );
+	F = F_Schlick( LdotH, newMaterial.F0S);
 
 	// Visibility Function (shadowing/masking)
 	float G = G_Smith( NdotV, LdotH, newMaterial.roughness);
@@ -253,7 +253,7 @@ vec3 computeSpecularDirect()
 vec3 computeDiffuseDirect()
 {
 	//metallic materials do not have diffuse
-	vec3 diffuse = (1- newMaterial.FresnelD)* newMaterial.color.xyz/PI;
+	vec3 diffuse = newMaterial.color.xyz/PI;
 	return diffuse;
 }
 
@@ -261,15 +261,16 @@ vec3 computeDiffuseDirect()
 vec3 computeSpecularIBL()
 {
 	vec3 specularSample = getReflectionColor(R, newMaterial.roughness);
-	vec2 brdf =  texture2D(u_brdf,vec2(NdotV, newMaterial.roughness)).xy;
+	vec2 coord = clamp(vec2(NdotV, newMaterial.roughness),0.01,0.999);
+	vec2 brdf = texture2D(u_brdf,coord).xy;
 	vec3 specularBRDF =  newMaterial.FresnelS * brdf.x + brdf.y;
-	vec3 specularIBL = specularSample* specularBRDF ;
+	vec3 specularIBL = specularSample* specularBRDF;
 	return specularIBL;
 }
 vec3 computeDiffuseIBL()
 {
 	vec3 diffuseSample = getReflectionColor(N, 1.0f);
-	vec3 diffuseBRDF =  newMaterial.color.xyz/PI;
+	vec3 diffuseBRDF =  newMaterial.color.xyz;
 	vec3 diffuseIBL = diffuseSample * diffuseBRDF;
 	diffuseIBL *= (1- newMaterial.FresnelD); //Energy conservation
 	return diffuseIBL;
@@ -303,17 +304,17 @@ void getMaterialProperties(){
 	
 	//Final light
 	vec3 Indirect = specularIBL + diffuseIBL;
-	vec3 Direct = (specular + diffuse) * NdotL; 
+	vec3 Direct = (specular + diffuse)*NdotL; 
 
 	if (u_is_ao == 1){
 		float ao_factor = texture2D(u_ao,uv).r;
 
 		//we could play with the curve to have more control
-		ao_factor = pow( ao_factor, 3.0 );
+		ao_factor = pow( ao_factor, 3.0);
 		Indirect *= ao_factor;
 	}
 
-	newMaterial.light =  Direct + Indirect;
+	newMaterial.light = specular*NdotL + specularIBL + diffuseIBL + diffuse* NdotL ;
 	newMaterial.light *= u_light_intensity;
 
 }
@@ -331,7 +332,6 @@ void main()
 	// 1. Create Material
 	newMaterial;
 	uv = v_uv;
-	computeVectors(); 
 	//displacement map
 	uv_diplace = uv; 
 	if(u_is_dispacement ==1){
@@ -340,12 +340,14 @@ void main()
 			uv_diplace = uv;
 	}
 	
-			
+	computeVectors(); 
+	
 	//normal
 	vec3 normal_pixel = texture2D(u_texNormal,uv_diplace).xyz;
 	vec3 normal = perturbNormal( N, V, uv_diplace, normal_pixel);
 	if (u_is_normal == 1)
 		N = normal;
+
 
 	//degamma emissive and albedo
 	emissive = texture2D(u_emissive,uv).xyz;
@@ -355,6 +357,7 @@ void main()
 
 	// 2. Fill Material
 	getMaterialProperties();
+
 	// 3. Shade (Direct + Indirect)
 	vec4 colorfinal =  getPixelColor();
 
@@ -371,8 +374,7 @@ void main()
 	}
 
 	// Last step: to gamma space
-	//colorfinal.xyz = linear_to_gamma(colorfinal.xyz);
+	colorfinal.xyz = linear_to_gamma(colorfinal.xyz);
 	gl_FragColor = colorfinal;
-		
 
 }
