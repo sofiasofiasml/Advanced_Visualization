@@ -50,10 +50,8 @@ vec3 L;
 vec3 N; 
 vec3 V; 
 vec3 R; 
-vec3 H; 
-vec3 F;
+vec3 H;
 vec3 emissive;
-vec3 light; 
 vec2 uv;
 
 float NdotV;
@@ -61,7 +59,6 @@ float NdotH;
 float LdotH;
 float NdotL;
 
-vec2 uv_diplace; 
 const float GAMMA = 2.2;
 const float INV_GAMMA = 1.0 / GAMMA;
 
@@ -70,27 +67,14 @@ struct PBRMatStruct
 	// properties
 	float roughness;
 	float metalness;
-	float cosTheta ;
+	float cosTheta;
 
 	vec3 Fresnel;
 	vec3 F0; 
 	vec3 light;
-	vec3 DifussedDirect;
-
 	vec4 color; 
 
 }newMaterial;
-
-//desplacement map
-vec2 ParallaxMapping(vec2 texCoords)
-{ 
-	float height = texture2D(u_texNormal, vec2 (uv.x, uv.y)).b; 
-	 vec2 scaleBias = vec2(height_scale); 
-	 float v = height * scaleBias.r - scaleBias.g; 
-	 vec2 newCoords = uv + (normalize(V.xy) * v); 
-
-	return newCoords; 
-} 
 
 // degamma
 vec3 gamma_to_linear(vec3 color)
@@ -196,7 +180,7 @@ void computeVectors()
 	L = normalize(u_light_dir);
 
 	V = normalize(u_camera_position - v_world_position); 
-	R = normalize(reflect(V, N)); 
+	R = normalize(reflect(-V, N)); 
 
 	H = normalize(V + L);
 
@@ -205,6 +189,7 @@ void computeVectors()
 	LdotH = dot(L,H);
 	NdotL = dot(N,L);
 }
+
 // Normal Distribution Function using GGX Distribution
 float D_GGX (const in float NoH, const in float linearRoughness )
 {
@@ -237,14 +222,14 @@ vec3 computeSpecularDirect()
 	float D = D_GGX( NdotH, a );
 	
 	// Fresnel Function
-	F = F_Schlick( LdotH, newMaterial.F0);
+	vec3 F = F_Schlick( LdotH, newMaterial.F0);
 
 	// Visibility Function (shadowing/masking)
 	float G = G_Smith( NdotV, NdotL, newMaterial.roughness);
 		
 	// Norm factor
 	vec3 spec = D * G * F;
-	spec /= (4.0 * dot(N,L) * dot(N,V) + 1e-6);  //1e^-6 para que nunca de 0/0
+	spec /= (4.0 * NdotL * NdotV + 1e-6);  //1e^-6 para que nunca de 0/0
 	//return spec ;
 	return vec3(G);
 
@@ -311,7 +296,7 @@ void getMaterialProperties(){
 		Indirect *= ao_factor;
 	}
 
-	newMaterial.light = specular*NdotL ;//* NdotL ;// + diffuse* NdotL ; // specularIBL + diffuseIBL +
+	newMaterial.light =  Direct;//+ Indirect;
 	newMaterial.light *= u_light_intensity;
 
 }
@@ -329,26 +314,19 @@ void main()
 	// 1. Create Material
 	newMaterial;
 	uv = v_uv;
-	//displacement map
-	uv_diplace = uv; 
-	if(u_is_dispacement ==1){
-		uv_diplace= ParallaxMapping(uv); 
-		if(uv_diplace.x > 1.0 || uv_diplace.y > 1.0 || uv_diplace.x < 0.0 || uv_diplace.y < 0.0)
-			uv_diplace = uv;
-	}
-	
+
 	computeVectors(); 
 	
 	//normal
-	vec3 normal_pixel = texture2D(u_texNormal,uv_diplace).xyz;
-	vec3 normal = perturbNormal( N, V, uv_diplace, normal_pixel);
+	vec3 normal_pixel = texture2D(u_texNormal,uv).xyz;
+	vec3 normal = perturbNormal( N, V, uv, normal_pixel);
 	if (u_is_normal == 1)
 		N = normal;
 
 
 	//degamma emissive and albedo
 	emissive = texture2D(u_emissive,uv).xyz;
-	newMaterial.color = texture2D(u_texAlbedo, uv_diplace);
+	newMaterial.color = texture2D(u_texAlbedo, uv);
 	newMaterial.color.xyz = gamma_to_linear(newMaterial.color.xyz);
 	emissive.xyz = gamma_to_linear(emissive.xyz);
 
@@ -359,19 +337,22 @@ void main()
 	vec4 colorfinal =  getPixelColor();
 
 	// 4. Apply Tonemapping
-	//colorfinal.xyz = toneMap(colorfinal.xyz);
+	colorfinal.xyz = toneMap(colorfinal.xyz);
+	
 
 	// 5. Any extra texture to apply after tonemapping
 	
 	if (u_is_opacity == 1)
 	{	
 		float opacity = texture2D(u_opacity,uv).r;
-		if(opacity != 1)
+		if(opacity != 1.0f)
 			colorfinal.a = opacity;
 	}
 
 	// Last step: to gamma space
-	//colorfinal.xyz = linear_to_gamma(colorfinal.xyz);
+
+	colorfinal.xyz = linear_to_gamma(colorfinal.xyz);
 	gl_FragColor = colorfinal;
+	
 
 }
