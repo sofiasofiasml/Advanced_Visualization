@@ -36,7 +36,6 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 
 	// OpenGL flags
 	glEnable(GL_CULL_FACE); //render both sides of every triangle
-	/*glCullFace(GL_FRONT_SIDE);*/
 	glEnable( GL_DEPTH_TEST ); //check the occlusions using the Z buffer
 
 	// Create camera
@@ -126,11 +125,6 @@ void Application::render(void)
 		skybox->loadCubemap();
 	
 	//set flags
-	/*glEnable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
-
-	glDisable(GL_CULL_FACE);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);*/
 	glEnable(GL_DEPTH_TEST);	
 	glCullFace(GL_FRONT);
 	glFrontFace(GL_CW);

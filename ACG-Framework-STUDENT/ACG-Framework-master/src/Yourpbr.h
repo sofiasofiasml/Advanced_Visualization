@@ -12,7 +12,7 @@ public:
 	Texture* tex_normal[3];
 	Texture* tex_rough[3];
 	Texture* tex_metal[3];
-	Texture* ao_tex[3];
+	Texture* ao_tex[2];
 
 	//only one texture
 	Texture* brdf_tex;

@@ -42,11 +42,15 @@ void yourpbr::renderInMenu()
 		ImGui::DragFloat("Normal", &this->normal_factor, 0.01f, 0, 1.0f);
 		ImGui::Checkbox("Show Normals", (bool*)&this->is_normal);
 		ImGui::Checkbox("Displacement Map", (bool*)&this->is_displacement);
-		ImGui::Checkbox("Show ambient oclussion", (bool*)&this->is_ao);
-
-		if (youmat->eTexture == youmat->HELMET)
+		
+		if (youmat->eTexture == youmat->HELMET) {
+			ImGui::Checkbox("Show ambient oclussion", (bool*)&this->is_ao);
 			ImGui::Checkbox("Show emissive", (bool*)&this->is_emissive);
-		if (youmat->eTexture == youmat->LANTERN)
+		}
+		if (youmat->eTexture == youmat->LANTERN) {
+			ImGui::Checkbox("Show ambient oclussion", (bool*)&this->is_ao);
 			ImGui::Checkbox("Show Opacity", (bool*)&this->is_opacity);
+
+		}
 	}
 }
