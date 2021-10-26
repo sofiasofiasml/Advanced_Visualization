@@ -119,15 +119,22 @@ void Application::render(void)
 
 	skybox_model.translate(camera->eye.x, camera->eye.y, camera->eye.z);
 	glDisable(GL_DEPTH_TEST); 
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 	skybox->material->render(skybox->mesh, skybox_model, camera); 
 	if(skybox->now_sky != skybox->before_sky)
 		skybox->loadCubemap();
 	
 	//set flags
-	glEnable(GL_DEPTH_TEST);
+	/*glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 
 	glDisable(GL_CULL_FACE);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);*/
+	glEnable(GL_DEPTH_TEST);	
+	glCullFace(GL_FRONT);
+	glFrontFace(GL_CW);
+	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	for (size_t i = 0; i < node_list.size(); i++) {
@@ -190,6 +197,8 @@ void Application::update(double seconds_elapsed)
 	if (Input::isKeyPressed(SDL_SCANCODE_S) || Input::isKeyPressed(SDL_SCANCODE_DOWN)) camera->move(Vector3(0.0f, 0.0f,-1.0f) * speed);
 	if (Input::isKeyPressed(SDL_SCANCODE_A) || Input::isKeyPressed(SDL_SCANCODE_LEFT)) camera->move(Vector3(1.0f, 0.0f, 0.0f) * speed);
 	if (Input::isKeyPressed(SDL_SCANCODE_D) || Input::isKeyPressed(SDL_SCANCODE_RIGHT)) camera->move(Vector3(-1.0f, 0.0f, 0.0f) * speed);
+	if (Input::isKeyPressed(SDL_SCANCODE_E)) camera->move(Vector3(0.0f, -1.0f, 0.0f) * (speed / 2));
+	if (Input::isKeyPressed(SDL_SCANCODE_Q)) camera->move(Vector3(0.0f, 1.0f, 0.0f) * (speed / 2));
 	if (Input::isKeyPressed(SDL_SCANCODE_SPACE)) camera->moveGlobal(Vector3(0.0f, -1.0f, 0.0f) * speed);
 	if (Input::isKeyPressed(SDL_SCANCODE_LCTRL)) camera->moveGlobal(Vector3(0.0f,  1.0f, 0.0f) * speed);
 
