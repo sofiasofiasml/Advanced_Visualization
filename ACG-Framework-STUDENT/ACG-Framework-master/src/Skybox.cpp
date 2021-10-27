@@ -24,7 +24,7 @@ void YourSkybox::renderInMenu()
 	if (mat->eMaterial != mat->PBR)
 		ImGui::Combo("Texture", &this->now_sky, "CITY\0SNOW\0DRAGONVALE\0");
 	else
-		ImGui::Combo("Texture", &this->now_sky, "PANORAMA\0PISA\0STUDIO\0");
+		ImGui::Combo("Texture", &this->now_sky, "BRIDGE\0PISA\0PANORAMA\0");
 
 }
 
@@ -46,11 +46,12 @@ void YourSkybox::loadCubemap()
 	}
 	else {
 		if (this->now_sky == 0)
-			loadHdr("data/environments/panorama.hdre");
+			loadHdr("data/environments/san_giuseppe_bridge.hdre");
 		else if (this->now_sky == 1)
 			loadHdr("data/environments/pisa.hdre");
 		else if (this->now_sky == 2)
-			loadHdr("data/environments/studio.hdre");
+			loadHdr("data/environments/panorama.hdre");
+
 
 		this->material->texture = this->hdr_tex[0];
 

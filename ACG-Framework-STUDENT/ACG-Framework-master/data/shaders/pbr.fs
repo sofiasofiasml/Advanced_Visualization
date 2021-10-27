@@ -45,6 +45,8 @@ uniform int u_is_emissive;
 uniform int u_is_helmet;
 uniform int u_is_dispacement;
 uniform float height_scale; 
+uniform int u_is_ibl;
+uniform int u_is_direct;
 
 vec3 L; 
 vec3 N; 
@@ -231,13 +233,13 @@ vec3 computeSpecularDirect()
 	vec3 spec = D * G * F;
 	spec /= (4.0 * NdotL * NdotV + 1e-6);  //1e^-6 para que nunca de 0/0
 	return spec ;
-	//return vec3(G);
 
 }
 vec3 computeDiffuseDirect()
 {
 	//metallic materials do not have diffuse
-	vec3 diffuse = newMaterial.color.xyz/PI;
+	vec3 diffuse = (newMaterial.color.xyz/PI);
+	diffuse *= (1-newMaterial.metalness);
 	return diffuse;
 }
 
@@ -251,10 +253,13 @@ vec3 computeSpecularIBL()
 	vec3 specularIBL = specularSample* specularBRDF;
 	return specularIBL;
 }
-vec3 computeDiffuseIBL()
+vec3 computeDiffuseIBL(vec3 diffuse)
 {
 	vec3 diffuseSample = getReflectionColor(N, 1.0f);
-	vec3 diffuseBRDF =  newMaterial.color.xyz;
+	vec3 diffuseBRDF =  diffuse;
+	vec3 F0  = mix(vec3(0.00),newMaterial.color.xyz, newMaterial.metalness);
+	float cosTheta = max(NdotV,0.0);
+	vec3 Fresnel =  FresnelSchlickRoughness(cosTheta, F0, newMaterial.roughness);
 	vec3 diffuseIBL = diffuseSample * diffuseBRDF;
 	diffuseIBL *= (1- newMaterial.Fresnel); //Energy conservation
 	return diffuseIBL;
@@ -270,7 +275,6 @@ void getMaterialProperties(){
 		newMaterial.roughness = texture2D(u_texRough, uv).y * u_Rough;
 	}
 	
-
 	//we compute the reflection in base to the color and the metalness
 	newMaterial.F0  = mix(vec3(0.04),newMaterial.color.xyz, newMaterial.metalness);
 	newMaterial.cosTheta = max(NdotV,0.0);
@@ -282,10 +286,10 @@ void getMaterialProperties(){
 
 	//Indirecta
 	vec3 specularIBL = computeSpecularIBL();
-	vec3 diffuseIBL = computeDiffuseIBL();
+	vec3 diffuseIBL = computeDiffuseIBL(diffuse);
 	
 	//Final light
-	vec3 Indirect = specularIBL + diffuseIBL;
+	vec3 Indirect =  diffuseIBL+ specularIBL;
 	vec3 Direct = (specular + diffuse)*NdotL; 
 
 	if (u_is_ao == 1){
@@ -296,8 +300,12 @@ void getMaterialProperties(){
 		Indirect *= ao_factor;
 	}
 
+	if(u_is_direct == 1)
+		newMaterial.light += Direct;
+		
+	if(u_is_ibl == 1)
+		newMaterial.light += Indirect;
 
-	newMaterial.light =   Indirect + Direct;
 	newMaterial.light *= u_light_intensity;
 
 }

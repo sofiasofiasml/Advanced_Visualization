@@ -55,6 +55,8 @@ void StandardMaterial::setUniforms(Camera* camera, Matrix44 model)
 	shader->setUniform1("u_is_ao", yourPbr->is_ao);
 	shader->setUniform1("u_is_emissive", yourPbr->is_emissive);
 	shader->setUniform1("u_is_dispacement", yourPbr->is_displacement);
+	shader->setUniform1("u_is_direct", yourPbr->is_direct);
+	shader->setUniform1("u_is_ibl", yourPbr->is_ibl);
 	
 	if (yourPbr->ao_tex[yourMat->eTexture])
 		shader->setUniform("u_ao", yourPbr->ao_tex[yourMat->eTexture], 13);

@@ -19,11 +19,14 @@ public:
 	Texture* opacity_tex;
 	Texture* emissive_tex;
 
+	//ImGUI
 	int is_normal;
 	int is_opacity;
 	int is_ao;
 	int is_emissive;
 	int is_displacement; 
+	int is_ibl;
+	int is_direct;
 
 	float roughness_factor;
 	float metal_factor;
