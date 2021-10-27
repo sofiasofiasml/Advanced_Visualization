@@ -177,17 +177,17 @@ vec3 toneMapUncharted(vec3 color)
 void computeVectors()
 {
 	N = normalize(v_normal); 
-	L = normalize(u_light_dir);
+	L = normalize(u_light_dir-v_world_position);
 
 	V = normalize(u_camera_position - v_world_position); 
 	R = normalize(reflect(-V, N)); 
 
 	H = normalize(V + L);
 
-	NdotV = dot(N,V);
-	NdotH = dot(N,H);
-	LdotH = dot(L,H);
-	NdotL = dot(N,L);
+	NdotV = clamp(dot(N,V),0,1);
+	NdotH = clamp(dot(N,H),0,1);
+	LdotH = clamp(dot(L,H),0,1);
+	NdotL = clamp(dot(N,L),0,1);
 }
 
 // Normal Distribution Function using GGX Distribution
@@ -230,8 +230,8 @@ vec3 computeSpecularDirect()
 	// Norm factor
 	vec3 spec = D * G * F;
 	spec /= (4.0 * NdotL * NdotV + 1e-6);  //1e^-6 para que nunca de 0/0
-	//return spec ;
-	return vec3(G);
+	return spec ;
+	//return vec3(G);
 
 }
 vec3 computeDiffuseDirect()
@@ -296,7 +296,8 @@ void getMaterialProperties(){
 		Indirect *= ao_factor;
 	}
 
-	newMaterial.light =  Direct;//+ Indirect;
+
+	newMaterial.light =   Indirect + Direct;
 	newMaterial.light *= u_light_intensity;
 
 }
