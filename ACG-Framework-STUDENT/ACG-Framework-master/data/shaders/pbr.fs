@@ -13,7 +13,7 @@ varying vec3 v_normal;
 varying vec3 v_world_position;
 varying vec3 v_position;
 
-uniform vec4 u_color;
+uniform vec4 u_color_factor;
 uniform vec3 u_ambient;
 uniform float u_light_intensity;
 uniform float u_alpha;
@@ -43,10 +43,11 @@ uniform int u_is_opacity;
 uniform int u_is_ao;
 uniform int u_is_emissive;
 uniform int u_is_helmet;
-uniform int u_is_dispacement;
-uniform float height_scale; 
 uniform int u_is_ibl;
 uniform int u_is_direct;
+uniform int u_output_tex;
+uniform	int u_ao_power;
+
 
 vec3 L; 
 vec3 N; 
@@ -74,6 +75,7 @@ struct PBRMatStruct
 	vec3 Fresnel;
 	vec3 F0; 
 	vec3 light;
+
 	vec4 color; 
 
 }newMaterial;
@@ -257,9 +259,6 @@ vec3 computeDiffuseIBL(vec3 diffuse)
 {
 	vec3 diffuseSample = getReflectionColor(N, 1.0f);
 	vec3 diffuseBRDF =  diffuse;
-	vec3 F0  = mix(vec3(0.00),newMaterial.color.xyz, newMaterial.metalness);
-	float cosTheta = max(NdotV,0.0);
-	vec3 Fresnel =  FresnelSchlickRoughness(cosTheta, F0, newMaterial.roughness);
 	vec3 diffuseIBL = diffuseSample * diffuseBRDF;
 	diffuseIBL *= (1- newMaterial.Fresnel); //Energy conservation
 	return diffuseIBL;
@@ -296,7 +295,7 @@ void getMaterialProperties(){
 		float ao_factor = texture2D(u_ao,uv).r;
 
 		//we could play with the curve to have more control
-		ao_factor = pow( ao_factor, 3.0);
+		ao_factor = pow( ao_factor, u_ao_power);
 		Indirect *= ao_factor;
 	}
 
@@ -306,7 +305,7 @@ void getMaterialProperties(){
 	if(u_is_ibl == 1)
 		newMaterial.light += Indirect;
 
-	newMaterial.light *= u_light_intensity;
+	newMaterial.light *= u_light_intensity * u_light_color;
 
 }
 //get diffuse and specular terms from direct lighting
@@ -337,6 +336,7 @@ void main()
 	emissive = texture2D(u_emissive,uv).xyz;
 	newMaterial.color = texture2D(u_texAlbedo, uv);
 	newMaterial.color.xyz = gamma_to_linear(newMaterial.color.xyz);
+	newMaterial.color *= u_color_factor;
 	emissive.xyz = gamma_to_linear(emissive.xyz);
 
 	// 2. Fill Material
@@ -361,7 +361,18 @@ void main()
 	// Last step: to gamma space
 
 	colorfinal.xyz = linear_to_gamma(colorfinal.xyz);
-	gl_FragColor = colorfinal;
+	newMaterial.color.xyz = linear_to_gamma(newMaterial.color.xyz);
+
+	if(u_output_tex == 1)//albedo 
+		gl_FragColor = newMaterial.color;
+	else if(u_output_tex == 2)//normals
+		gl_FragColor = vec4(vec3(N),1.0);
+	else if(u_output_tex == 3 )//roughness
+		gl_FragColor = vec4(vec3(newMaterial.roughness),1.0);
+	else if(u_output_tex == 4)//metalness
+		gl_FragColor = vec4(vec3(newMaterial.metalness),1.0);
+	else
+		gl_FragColor = colorfinal;
 	
 
 }

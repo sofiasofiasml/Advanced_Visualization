@@ -7,6 +7,8 @@ class yourpbr : public StandardMaterial
 {
 
 public:
+	enum output { COMPLETE, ALBEDO, NORMAL, METALNESS, ROUGHNESS };
+	output eOutput;
 
 	Texture* tex_albedo[3];
 	Texture* tex_normal[3];
@@ -27,6 +29,7 @@ public:
 	int is_displacement; 
 	int is_ibl;
 	int is_direct;
+	int ao_power;
 
 	float roughness_factor;
 	float metal_factor;
