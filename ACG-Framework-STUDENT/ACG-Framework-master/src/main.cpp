@@ -121,7 +121,8 @@ void renderGUI(SDL_Window* window, Application * game)
 			}
 		}
 		if (Application::instance->material_basic->eMaterial == Application::instance->material_basic->PHONG ||
-			Application::instance->material_basic->eMaterial == Application::instance->material_basic->PBR) {
+			Application::instance->material_basic->eMaterial == Application::instance->material_basic->PBR ||
+			Application::instance->material_basic->eMaterial == Application::instance->material_basic->REFLECTIVE) {
 			if (ImGui::TreeNode("Light")) {
 				game->directional->renderInMenu();
 				ImGui::TreePop();

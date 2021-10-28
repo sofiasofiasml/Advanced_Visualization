@@ -36,6 +36,6 @@ void main()
 	vec3 Re = reflect(I, N); 
 		
 	color =   vec4(light,1.0)*u_light_intensity*textureCube(u_skybox,Re); 	
-	gl_FragColor = color;
+	gl_FragColor = color; 
 
 }

@@ -128,7 +128,8 @@ void Application::render(void)
 	glEnable(GL_DEPTH_TEST);	
 	glCullFace(GL_FRONT);
 	glFrontFace(GL_CW);
-	glEnable(GL_BLEND);
+	if(material_basic->eMaterial != material_basic->REFLECTIVE)
+		glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	for (size_t i = 0; i < node_list.size(); i++) {
@@ -163,7 +164,8 @@ void Application::render(void)
 		node_list[i]->model = model;
 
 	}
-	glDisable(GL_BLEND);
+	if (material_basic->eMaterial != material_basic->REFLECTIVE)
+		glDisable(GL_BLEND);
 
 }
 
