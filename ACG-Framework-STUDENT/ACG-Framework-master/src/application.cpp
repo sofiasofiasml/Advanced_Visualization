@@ -130,7 +130,7 @@ void Application::render(void)
 	glEnable(GL_DEPTH_TEST);	
 	glCullFace(GL_FRONT);
 	glFrontFace(GL_CW);
-	if(material_basic->eMaterial != material_basic->REFLECTIVE)
+	if(material_basic->eMaterial == material_basic->PBR)
 		glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -166,7 +166,7 @@ void Application::render(void)
 		node_list[i]->model = model;
 
 	}
-	if (material_basic->eMaterial != material_basic->REFLECTIVE)
+	if (material_basic->eMaterial == material_basic->PBR)
 		glDisable(GL_BLEND);
 
 }

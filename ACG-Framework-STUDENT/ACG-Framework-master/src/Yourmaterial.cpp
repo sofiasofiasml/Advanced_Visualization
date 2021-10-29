@@ -23,10 +23,8 @@ void yourmaterial::renderInMenu()
 	ImGui::Combo("Output", (int*)&mat->eMaterial, "TEXTURE\0PHONG\0REFLECTIVE\0PBR\0");
 	ImGui::Combo("Texture", (int*)&mat->eTexture, "HELMET\0LANTERN\0BALL\0");
 	if (eMaterial==PHONG)
-	{
 		ImGui::Checkbox("Show Texture",(bool*) &mat->u_active);
-		Application::instance->directional->intensity = 0.5;
-	}
+	
 	if(eMaterial != eMaterial_aux->eMaterial)
 		Application::instance->skybox->loadCubemap();
 

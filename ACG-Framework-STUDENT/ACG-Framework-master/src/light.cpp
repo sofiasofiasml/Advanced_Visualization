@@ -7,7 +7,7 @@
 	this->direction = Vector3(1, 1, 0); 
 	this->position = Vector3(0, 20, 0); 
 	this->alpha = 2;
-	this->intensity = 1.0f;
+	this->intensity = 0.5f;
 
  }
 
@@ -16,7 +16,7 @@
 	 //imGui
 	 yourmaterial* mat = Application::instance->material_basic;
 
-	ImGui::DragFloat("Intensity", &this->intensity, 0.01f, 0, 1.0f);
+	ImGui::DragFloat("Intensity", &this->intensity, 0.01f, 0.1f, 1.0f);
 	ImGui::DragFloat3("Direction", &this->direction.x, 0.1f, -10, 10);
 	ImGui::ColorEdit4("Color", &this->color.x);
 

@@ -14,6 +14,16 @@ uniform vec3 u_camera_position;
 uniform samplerCube u_skybox;
 vec4 color; 
 vec3 light; 
+
+const float GAMMA = 2.2;
+const float INV_GAMMA = 1.0 / GAMMA;
+// toneMap
+
+vec3 toneMap(vec3 color)
+{
+    return color / (color + vec3(1.0));
+}
+
 void main()
 {
 	vec2 uv = v_uv;
@@ -36,6 +46,11 @@ void main()
 	vec3 Re = reflect(I, N); 
 		
 	color =   vec4(light,1.0)*u_light_intensity*textureCube(u_skybox,Re); 	
+	// 4. Apply Tonemapping
+	color.xyz = toneMap(color.xyz);
+	// Last step: to gamma space
+
+	
 	gl_FragColor = color; 
 
 }
