@@ -97,6 +97,7 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 	directional = new Light();
 	
 	skybox = new YourSkybox(); 
+	
 	//hide the cursor
 	SDL_ShowCursor(!mouse_locked); //hide or show the mouse
 }
@@ -120,8 +121,9 @@ void Application::render(void)
 	glDisable(GL_DEPTH_TEST); 
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
-	skybox->material->render(skybox->mesh, skybox_model, camera); 
-	if(skybox->now_sky != skybox->before_sky)
+
+	skybox->render(skybox->mesh, skybox_model, camera); 
+	if (skybox->now_sky != skybox->before_sky)
 		skybox->loadCubemap();
 	
 	//set flags

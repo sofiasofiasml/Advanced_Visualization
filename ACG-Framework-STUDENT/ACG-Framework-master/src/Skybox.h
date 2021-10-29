@@ -13,9 +13,14 @@ public:
 	int before_sky;
 
 	Texture* hdr_tex[LEVEL];
+	Texture* tex_skybox; 
 	HDRE* hdre;
+	Shader* shader_skybox;
 
 	YourSkybox(); 
+
+	void setUniforms(Camera* camera, Matrix44 model);
+	void render(Mesh* mesh, Matrix44 model, Camera* camera);
 	void loadCubemap();
 	void renderInMenu(); 
 	void loadHdr(const char* folder);

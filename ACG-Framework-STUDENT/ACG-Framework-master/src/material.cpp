@@ -34,6 +34,8 @@ void StandardMaterial::setUniforms(Camera* camera, Matrix44 model)
 	shader->setUniform("u_light_intensity", light_dir->intensity);
 	shader->setUniform("u_light_dir", light_dir->direction);
 
+	//Reflective 
+	shader->setUniform("u_skybox", app->skybox->tex_skybox,16); 
 	//phong
 	shader->setUniform("u_ambient", light_dir->ambient);
 	shader->setUniform("u_light_color", light_dir->color);
