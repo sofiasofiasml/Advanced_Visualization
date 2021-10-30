@@ -8,11 +8,9 @@ yourpbr::yourpbr()
 	this->is_opacity = 0;
 	this->is_ao = 0;
 	this->is_emissive = 0;
-	this->is_displacement = 0;
 	this->is_ibl = 1;
 	this->is_direct = 1;
 
-	this->desplacement_factor = 1.0f; 
 	this->roughness_factor = 1.0f;
 	this->metal_factor = 1.0f;
 	this->normal_factor = 1.0f;
@@ -26,11 +24,9 @@ void yourpbr::reset()
 	this->is_opacity = 0;
 	this->is_ao = 0;
 	this->is_emissive = 0;
-	this->is_displacement = 0;
 	this->is_ibl = 1;
 	this->is_direct = 1;
 
-	this->desplacement_factor = 1.0f;
 	this->roughness_factor = 1.0f;
 	this->metal_factor = 1.0f;
 	this->normal_factor = 1.0f;
@@ -48,11 +44,9 @@ void yourpbr::renderInMenu()
 		ImGui::Checkbox("Direct light", (bool*)&this->is_direct);
 		ImGui::Checkbox("IBL", (bool*)&this->is_ibl);
 		ImGui::DragFloat("Metalness", &this->metal_factor, 0.01f, 0, 1.0f);
-		ImGui::DragFloat("Desplacement", &this->desplacement_factor, 0.01f, 0, 127.0f);
 		ImGui::DragFloat("Roughness", &this->roughness_factor, 0.01f, 0, 1.0f);
 		ImGui::DragFloat("Normal", &this->normal_factor, 0.01f, 0, 1.0f);
 		ImGui::Checkbox("Show Normals", (bool*)&this->is_normal);
-		ImGui::Checkbox("Displacement Map", (bool*)&this->is_displacement);
 		
 		
 		if (youmat->eTexture == youmat->HELMET)

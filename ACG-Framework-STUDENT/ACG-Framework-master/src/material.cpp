@@ -46,7 +46,6 @@ void StandardMaterial::setUniforms(Camera* camera, Matrix44 model)
 	//pbr
 	shader->setUniform("u_Metal", yourPbr->metal_factor);
 	shader->setUniform("u_Rough", yourPbr->roughness_factor);
-	shader->setUniform("height_scale", yourPbr->desplacement_factor);
 	shader->setUniform("u_Normal", yourPbr->normal_factor);
 	shader->setUniform("u_brdf", yourPbr->brdf_tex, 11);
 	shader->setUniform("u_opacity", yourPbr->opacity_tex, 12);
@@ -56,7 +55,6 @@ void StandardMaterial::setUniforms(Camera* camera, Matrix44 model)
 	shader->setUniform1("u_is_opacity", yourPbr->is_opacity);
 	shader->setUniform1("u_is_ao", yourPbr->is_ao);
 	shader->setUniform1("u_is_emissive", yourPbr->is_emissive);
-	shader->setUniform1("u_is_dispacement", yourPbr->is_displacement);
 	shader->setUniform1("u_is_direct", yourPbr->is_direct);
 	shader->setUniform1("u_is_ibl", yourPbr->is_ibl);
 	shader->setUniform1("u_output_tex", yourPbr->eOutput);
@@ -71,12 +69,11 @@ void StandardMaterial::setUniforms(Camera* camera, Matrix44 model)
 	if (this->texture)
 		shader->setUniform("u_texture", this->texture,0);
 
-	//if (yourPbr->tex_albedo && yourPbr->tex_metal && yourPbr->tex_normal && yourPbr->tex_rough) {
-		shader->setUniform("u_texAlbedo", yourPbr->tex_albedo[yourMat->eTexture], 1);
-		shader->setUniform("u_texMetal", yourPbr->tex_metal[yourMat->eTexture], 2);
-		shader->setUniform("u_texNormal", yourPbr->tex_normal[yourMat->eTexture], 3);
-		shader->setUniform("u_texRough", yourPbr->tex_rough[yourMat->eTexture], 4);
-	//}
+	shader->setUniform("u_texAlbedo", yourPbr->tex_albedo[yourMat->eTexture], 1);
+	shader->setUniform("u_texMetal", yourPbr->tex_metal[yourMat->eTexture], 2);
+	shader->setUniform("u_texNormal", yourPbr->tex_normal[yourMat->eTexture], 3);
+	shader->setUniform("u_texRough", yourPbr->tex_rough[yourMat->eTexture], 4);
+	
 	if (skybox->hdr_tex)
 	{
 		shader->setUniform("u_texture_prem", skybox->hdr_tex[0], 5);
