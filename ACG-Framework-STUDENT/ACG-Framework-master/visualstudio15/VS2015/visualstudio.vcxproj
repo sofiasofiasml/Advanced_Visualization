@@ -172,6 +172,7 @@
     <ClCompile Include="..\..\src\texture.cpp" />
     <ClCompile Include="..\..\src\utils.cpp" />
     <ClCompile Include="..\..\src\volume.cpp" />
+    <ClCompile Include="..\..\src\VolumeMaterial.cpp" />
     <ClCompile Include="..\..\src\Yourmaterial.cpp" />
     <ClCompile Include="..\..\src\Yourpbr.cpp" />
   </ItemGroup>
@@ -226,6 +227,7 @@
     <ClInclude Include="..\..\src\texture.h" />
     <ClInclude Include="..\..\src\utils.h" />
     <ClInclude Include="..\..\src\volume.h" />
+    <ClInclude Include="..\..\src\VolumeMaterial.h" />
     <ClInclude Include="..\..\src\Yourmaterial.h" />
     <ClInclude Include="..\..\src\Yourpbr.h" />
   </ItemGroup>

@@ -112,6 +112,7 @@
     <ClCompile Include="..\..\src\Yourpbr.cpp">
       <Filter>gfx</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\VolumeMaterial.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\camera.h" />
@@ -224,6 +225,7 @@
     <ClInclude Include="..\..\src\Yourpbr.h">
       <Filter>gfx</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\VolumeMaterial.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="extra">
