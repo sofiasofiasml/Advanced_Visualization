@@ -13,6 +13,7 @@
 #include "Skybox.h"
 #include "yourmaterial.h"
 #include "yourpbr.h"
+#include "VolumeMaterial.h"
 
 
 enum EOutput {
@@ -54,7 +55,7 @@ public:
 
 	//Skybox
 	YourSkybox* skybox; 
-
+	volumematerial* material_volumetric;
 	yourmaterial* material_basic;
 
 	yourpbr* material_pbr;

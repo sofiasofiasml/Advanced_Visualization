@@ -44,6 +44,8 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 	camera->setPerspective(45.f,window_width/(float)window_height,0.1f,10000.f); //set the projection, we want to be perspective
 
 	material_basic = new yourmaterial();
+	material_volumetric = new volumematerial();
+
 	material_pbr = new yourpbr();
 	{
 		StandardMaterial* mat = new StandardMaterial();
@@ -90,12 +92,10 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 		node->material->texture = material_pbr->tex_albedo[0]; // sample2d in shader
 		node->mesh = material_basic->meshHelmet;
 		node->model.translate(0, 1, 0);
-		//node->model.scale(0.02, 0.02, 0.02);
 		node_list.push_back(node);
 	}
 	
 	directional = new Light();
-	
 	skybox = new YourSkybox(); 
 	
 	//hide the cursor
