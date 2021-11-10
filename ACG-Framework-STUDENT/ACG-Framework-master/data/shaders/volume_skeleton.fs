@@ -24,7 +24,7 @@ void main(){
 	// Ray loop
 	for(int i=0; i<MAX_ITERATIONS; i++){
 		// 2. Volume sampling
-		float d = 1.0;//texture3D(u_texture,vec3).x;
+		float d = texture3D(u_texture,samplePos).x;
 
 		// 3. Classification
 		vec4 sampleColor = vec4(d,d,d,d);
@@ -34,7 +34,7 @@ void main(){
 		colorFinal += rayStep * (1.0 - colorFinal.a) * sampleColor;
 
 		// 5. Next sample
-		samplePos += rayStep;
+		samplePos += rayStep+i;
 
 		// 6. Early termination
 		
