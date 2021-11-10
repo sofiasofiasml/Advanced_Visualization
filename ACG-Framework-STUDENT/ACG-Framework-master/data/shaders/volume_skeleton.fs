@@ -9,7 +9,7 @@ uniform vec3 u_camera_position;
 uniform sampler3D u_texture;
 uniform float u_rayStep;
 
-vec3 colorFinal;
+vec4 colorFinal;
 vec3 rayDir;
 vec3 samplePos;
 float rayStep;
@@ -17,31 +17,30 @@ float rayStep;
 void main(){
 	// 1. Ray setup
 	//...
-	colorFinal = vec3(0);
+	colorFinal = vec4(0);
 	rayDir = normalize(v_position-u_camera_position);
 	rayStep = u_rayStep;
 	samplePos = v_position;
-
 	// Ray loop
-	for(int=0; i<MAX_ITERATIONS; i++){
+	for(int i=0; i<MAX_ITERATIONS; i++){
 		// 2. Volume sampling
-		//...
+		float d = 1.0;//texture3D(u_texture,vec3).x;
 
 		// 3. Classification
-		//...
+		vec4 sampleColor = vec4(d,d,d,d);
 
 		// 4. Composition
-		//...
+		sampleColor.rgb *= sampleColor.a;
+		colorFinal += rayStep * (1.0 - colorFinal.a) * sampleColor;
 
 		// 5. Next sample
-		//...
+		samplePos += rayStep;
 
 		// 6. Early termination
-		//...
+		
+
 	}
 
 	//7. Final color
-	//...
-	
-	gl_FragColor = vec4(colorFinal,1);
+	gl_FragColor = vec4(colorFinal.rgb,1);
 }

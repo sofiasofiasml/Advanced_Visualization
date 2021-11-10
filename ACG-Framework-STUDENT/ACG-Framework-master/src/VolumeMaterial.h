@@ -10,14 +10,17 @@ public:
 	Volume* volumeFoot;
 	Volume* volumeBonsai;
 	Volume* volumeTea;
-	Texture* texture;
+
+	Texture* textureFoot;
+	Texture* textureBonsai;
+	Texture* textureTea;
+
 	Volume* volume;
 	Shader* shader;
 	float rayStep;
 
 	volumematerial();
 
-	void render(Camera* camera, Matrix44 model);
 	void SetUniforms(Camera* camera, Matrix44 model);
 	void loadVolumeImg();
 	void renderInMenu();

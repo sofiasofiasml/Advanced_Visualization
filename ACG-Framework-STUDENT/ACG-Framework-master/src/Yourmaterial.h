@@ -5,7 +5,7 @@
 class yourmaterial : public StandardMaterial
 {
 public:
-	enum shaders { TEXTURE, PHONG, REFLECTIVE, PBR};
+	enum shaders { TEXTURE, PHONG, REFLECTIVE, PBR, VOLUME};
 	shaders eMaterial;
 
 	enum tex_material {HELMET, LANTERN, BALL };
@@ -26,6 +26,7 @@ public:
 	Shader* shader_phong = NULL;
 	Shader* shader_reflective = NULL;
 	Shader* shader_pbr = NULL;
+	Shader* shader_volume = NULL;
 
 	//Var for the imGui options
 	int u_active;

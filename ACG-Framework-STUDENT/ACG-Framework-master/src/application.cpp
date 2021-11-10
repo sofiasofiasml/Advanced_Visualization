@@ -44,7 +44,7 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 	camera->setPerspective(45.f,window_width/(float)window_height,0.1f,10000.f); //set the projection, we want to be perspective
 
 	material_basic = new yourmaterial();
-	material_volumetric = new volumematerial();
+	//material_volumetric = new volumematerial();
 
 	material_pbr = new yourpbr();
 	{
@@ -88,6 +88,7 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 		material_basic->shader_phong = Shader::Get("data/shaders/basic.vs", "data/shaders/phong.fs");
 		material_basic->shader_reflective = Shader::Get("data/shaders/basic.vs", "data/shaders/reflective.fs");
 		material_basic->shader_pbr = Shader::Get("data/shaders/basic.vs", "data/shaders/pbr.fs");
+		material_basic->shader_volume = Shader::Get("data/shaders/basic.vs", "data/shaders/volume_skeleton.fs");
 		
 		node->material->texture = material_pbr->tex_albedo[0]; // sample2d in shader
 		node->mesh = material_basic->meshHelmet;
@@ -146,20 +147,25 @@ void Application::render(void)
 			node_list[i]->material->shader = material_basic->shader_reflective;
 		else if (material_basic->eMaterial == material_basic->PBR)
 			node_list[i]->material->shader = material_basic->shader_pbr;
+		/*else if (material_basic->eMaterial == material_basic->VOLUME)
+			node_list[i]->material->shader = material_basic->shader_volume;*/
 		node_list[i]->render(camera);
 
 		if(render_wireframe)
 			node_list[i]->renderWireframe(camera);
 
 		//We change the mesh if we change the imGui options
-		if (node_list[i]->mesh_selected == 0)
-			node_list[i]->mesh = material_basic->meshHelmet;
-		else if (node_list[i]->mesh_selected == 1) {
-			node_list[i]->mesh = material_basic->meshLantern;
-			model.scale(0.02, 0.02, 0.02);
+		if(material_basic->eMaterial != material_basic->VOLUME){
+			if (node_list[i]->mesh_selected == 0)
+				node_list[i]->mesh = material_basic->meshHelmet;
+			else if (node_list[i]->mesh_selected == 1) {
+				node_list[i]->mesh = material_basic->meshLantern;
+				model.scale(0.02, 0.02, 0.02);
+			}
+			else if (node_list[i]->mesh_selected == 2)
+				node_list[i]->mesh = material_basic->meshSphere;
 		}
-		else if (node_list[i]->mesh_selected == 2)
-			node_list[i]->mesh = material_basic->meshSphere;
+		
 
 		//We change the texture if we change the imGui options
 		node_list[i]->material->texture = material_pbr->tex_albedo[material_basic->eTexture];
