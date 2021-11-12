@@ -63,10 +63,11 @@ void StandardMaterial::setUniforms(Camera* camera, Matrix44 model)
 
 	//Volume
 	this->shader->setUniform("u_rayStep", volumeMat->rayStep);
+	this->shader->setUniform1("u_brightness", volumeMat->brightness);
 	
 
-	if (yourMat->eMaterial == yourMat->VOLUME && volumeMat->textureFoot)
-		this->shader->setUniform("u_texture", volumeMat->textureFoot, 15);
+	if (yourMat->eMaterial == yourMat->VOLUME && volumeMat->texture)
+		this->shader->setUniform("u_texture", volumeMat->texture, 15);
 	
 	else if (this->texture)
 		shader->setUniform("u_texture", this->texture, 0);

@@ -121,8 +121,8 @@ void Application::render(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//set the camera as default
 	camera->enable();
-	
-	skybox->render(skybox->mesh, camera); 
+	if(material_basic->eMaterial != material_basic->VOLUME)
+		skybox->render(skybox->mesh, camera); 
 		
 	//set flags
 	glEnable(GL_DEPTH_TEST);	

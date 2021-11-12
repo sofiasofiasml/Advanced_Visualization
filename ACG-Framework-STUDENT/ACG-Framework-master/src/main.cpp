@@ -135,6 +135,14 @@ void renderGUI(SDL_Window* window, Application * game)
 			}
 				
 		}
+		//volume
+		if (Application::instance->material_basic->eMaterial == Application::instance->material_basic->VOLUME)
+		{
+			if (ImGui::TreeNode("Volume")) {
+				game->material_volumetric->renderInMenu();
+				ImGui::TreePop();
+			}
+		}
 		//Scene graph
 		if (ImGui::TreeNode("Entities"))
 		{

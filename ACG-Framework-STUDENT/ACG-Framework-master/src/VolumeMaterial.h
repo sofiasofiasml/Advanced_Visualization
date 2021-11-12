@@ -6,6 +6,10 @@
 class volumematerial : public StandardMaterial
 {
 public:
+	enum images { FOOT, TEAPOT, BONSAI};
+	images eImages;
+
+
 	Mesh* mesh;
 	Volume* volumeFoot;
 	Volume* volumeBonsai;
@@ -15,9 +19,9 @@ public:
 	Texture* textureBonsai;
 	Texture* textureTea;
 
-	Volume* volume;
 	Shader* shader;
 	float rayStep;
+	int brightness;
 
 	volumematerial();
 
