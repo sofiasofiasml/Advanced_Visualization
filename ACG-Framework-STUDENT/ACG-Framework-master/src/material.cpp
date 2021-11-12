@@ -21,6 +21,7 @@ void StandardMaterial::setUniforms(Camera* camera, Matrix44 model)
 	yourmaterial* yourMat = Application::instance->material_basic;
 	yourpbr* yourPbr = Application::instance->material_pbr;
 	YourSkybox* skybox = Application::instance->skybox;
+	volumematerial* volumeMat = Application::instance->material_volumetric; 
 
 	//upload node uniforms
 	shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
@@ -59,15 +60,23 @@ void StandardMaterial::setUniforms(Camera* camera, Matrix44 model)
 	shader->setUniform1("u_is_ibl", yourPbr->is_ibl);
 	shader->setUniform1("u_output_tex", yourPbr->eOutput);
 	shader->setUniform1("u_ao_power", yourPbr->ao_power);
+
+	//Volume
+	this->shader->setUniform("u_rayStep", volumeMat->rayStep);
 	
+
+	if (yourMat->eMaterial == yourMat->VOLUME && volumeMat->textureFoot)
+		this->shader->setUniform("u_texture", volumeMat->textureFoot, 15);
 	
+	else if (this->texture)
+		shader->setUniform("u_texture", this->texture, 0);
+
 	if (yourPbr->ao_tex[yourMat->eTexture])
 		shader->setUniform("u_ao", yourPbr->ao_tex[yourMat->eTexture], 13);
 		
 	shader->setUniform("u_emissive", yourPbr->emissive_tex, 14);
 
-	if (this->texture)
-		shader->setUniform("u_texture", this->texture,0);
+	
 
 	shader->setUniform("u_texAlbedo", yourPbr->tex_albedo[yourMat->eTexture], 1);
 	shader->setUniform("u_texMetal", yourPbr->tex_metal[yourMat->eTexture], 2);

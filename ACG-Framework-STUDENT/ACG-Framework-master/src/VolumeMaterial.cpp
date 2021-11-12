@@ -28,24 +28,6 @@ void volumematerial::SetUniforms(Camera* camera, Matrix44 model)
 
 }
 
-void volumematerial::render(Camera* camera, Matrix44 model, Mesh* mesh)
-{
-	if (mesh && this->shader)
-	{
-		//enable shader
-		this->shader->enable();
-
-		//upload uniforms
-		this->SetUniforms(camera, model);
-
-		//do the draw call
-		mesh->render(GL_TRIANGLES);
-
-		//disable shader
-		this->shader->disable();
-	}
-
-}
 
 void volumematerial::loadVolumeImg()
 {

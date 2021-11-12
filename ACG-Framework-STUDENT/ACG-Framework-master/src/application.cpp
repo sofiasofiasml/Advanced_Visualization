@@ -97,8 +97,7 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 		material_basic->shader_volume = Shader::Get("data/shaders/basic.vs", "data/shaders/volume_skeleton.fs");
 		
 		node->material->texture = material_pbr->tex_albedo[0]; // sample2d in shader
-		//node->mesh = material_basic->meshHelmet;
-		node->mesh = material_volumetric->mesh;
+		node->mesh = material_basic->meshHelmet;
 		node->model.translate(0, 1, 0);
 		node_list.push_back(node);
 
@@ -123,59 +122,56 @@ void Application::render(void)
 	//set the camera as default
 	camera->enable();
 	
-
-	if (material_basic->eMaterial != material_basic->VOLUME) {
-		skybox->render(skybox->mesh, camera); 
+	skybox->render(skybox->mesh, camera); 
 		
-		//set flags
-		glEnable(GL_DEPTH_TEST);	
-		glCullFace(GL_FRONT);
-		glFrontFace(GL_CW);
-		if(material_basic->eMaterial == material_basic->PBR)
-			glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//set flags
+	glEnable(GL_DEPTH_TEST);	
+	glCullFace(GL_FRONT);
+	glFrontFace(GL_CW);
+	if(material_basic->eMaterial == material_basic->PBR)
+		glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	//if ira aqui despues de añadir skybox a 0
-		for (size_t i = 0; i < node_list.size(); i++) {
-			Matrix44 model;
-			model.translate(0, 1, 0);
+//if ira aqui despues de añadir skybox a 0
+	for (size_t i = 0; i < node_list.size(); i++) {
+		Matrix44 model;
+		model.translate(0, 1, 0);
 
-			if (material_basic->eMaterial == material_basic->TEXTURE)
-				node_list[i]->material->shader = material_basic->shader_flat;
-			else if (material_basic->eMaterial == material_basic->PHONG)
-				node_list[i]->material->shader = material_basic->shader_phong;
-			else if (material_basic->eMaterial == material_basic->REFLECTIVE)
-				node_list[i]->material->shader = material_basic->shader_reflective;
-			else if (material_basic->eMaterial == material_basic->PBR)
-				node_list[i]->material->shader = material_basic->shader_pbr;
-			node_list[i]->render(camera);
+		if (material_basic->eMaterial == material_basic->TEXTURE)
+			node_list[i]->material->shader = material_basic->shader_flat;
+		else if (material_basic->eMaterial == material_basic->PHONG)
+			node_list[i]->material->shader = material_basic->shader_phong;
+		else if (material_basic->eMaterial == material_basic->REFLECTIVE)
+			node_list[i]->material->shader = material_basic->shader_reflective;
+		else if (material_basic->eMaterial == material_basic->PBR)
+			node_list[i]->material->shader = material_basic->shader_pbr;
+		else if(material_basic->eMaterial ==material_basic->VOLUME)
+			node_list[i]->material->shader = material_basic->shader_volume;
+		node_list[i]->render(camera);
 
-			if(render_wireframe)
-				node_list[i]->renderWireframe(camera);
+		if(render_wireframe)
+			node_list[i]->renderWireframe(camera);
 
-			//We change the mesh if we change the imGui options
-			/*if(material_basic->eMaterial != material_basic->VOLUME){ //DESCOMENTAR CUANDO FUNCIONE
-				if (node_list[i]->mesh_selected == 0)
-					node_list[i]->mesh = material_basic->meshHelmet;
-				else if (node_list[i]->mesh_selected == 1) {
-					node_list[i]->mesh = material_basic->meshLantern;
-					model.scale(0.02, 0.02, 0.02);
-				}
-				else if (node_list[i]->mesh_selected == 2)
-					node_list[i]->mesh = material_basic->meshSphere;
-			}*/
-		
-
-			//We change the texture if we change the imGui options
-			node_list[i]->material->texture = material_pbr->tex_albedo[material_basic->eTexture];
-			node_list[i]->model = model;
-
+		//We change the mesh if we change the imGui options
+		if(material_basic->eMaterial != material_basic->VOLUME){ //DESCOMENTAR CUANDO FUNCIONE
+			if (node_list[i]->mesh_selected == 0)
+				node_list[i]->mesh = material_basic->meshHelmet;
+			else if (node_list[i]->mesh_selected == 1) {
+				node_list[i]->mesh = material_basic->meshLantern;
+				model.scale(0.02, 0.02, 0.02);
+			}
+			else if (node_list[i]->mesh_selected == 2)
+				node_list[i]->mesh = material_basic->meshSphere;
 		}
+		else 
+			node_list[i]->mesh = material_volumetric->mesh; 
+
+		//We change the texture if we change the imGui options
+		node_list[i]->material->texture = material_pbr->tex_albedo[material_basic->eTexture];
+		node_list[i]->model = model;
+
 	}
-	else {
-		//glEnable(GL_DEPTH_TEST);
-		material_volumetric->render(camera, node_list[0]->model,node_list[0]->mesh);
-	}
+	
 		
 	glDisable(GL_BLEND);
 
