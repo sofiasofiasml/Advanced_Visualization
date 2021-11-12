@@ -30,7 +30,7 @@ void volumematerial::SetUniforms(Camera* camera, Matrix44 model)
 
 void volumematerial::render(Camera* camera, Matrix44 model, Mesh* mesh)
 {
-	if (this->mesh && this->shader)
+	if (mesh && this->shader)
 	{
 		//enable shader
 		this->shader->enable();

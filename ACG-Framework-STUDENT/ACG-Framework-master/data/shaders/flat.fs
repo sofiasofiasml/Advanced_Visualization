@@ -13,11 +13,10 @@ uniform vec3 u_camera_position;
 uniform sampler2D u_texture;
 vec4 color; 
 vec3 light; 
+
 void main()
 {
 	vec2 uv = v_uv;
 	color =  texture2D(u_texture, uv );
-	//gl_FragColor = color;
-	gl_FragColor = vec4(1,0,0,1);
-
+	gl_FragColor = color;
 }

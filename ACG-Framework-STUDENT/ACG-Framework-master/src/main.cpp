@@ -128,9 +128,12 @@ void renderGUI(SDL_Window* window, Application * game)
 				ImGui::TreePop();
 			}
 		}
-		if (ImGui::TreeNode("Skybox")) {
-			game->skybox->renderInMenu();
-			ImGui::TreePop();
+		if (Application::instance->material_basic->eMaterial != Application::instance->material_basic->VOLUME) {
+			if (ImGui::TreeNode("Skybox")) {
+				game->skybox->renderInMenu();
+				ImGui::TreePop();
+			}
+				
 		}
 		//Scene graph
 		if (ImGui::TreeNode("Entities"))

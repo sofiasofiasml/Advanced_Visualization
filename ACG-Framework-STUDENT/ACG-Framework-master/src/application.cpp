@@ -173,9 +173,7 @@ void Application::render(void)
 		}
 	}
 	else {
-		glEnable(GL_DEPTH_TEST);
-		glCullFace(GL_FRONT);
-		glFrontFace(GL_CW);
+		//glEnable(GL_DEPTH_TEST);
 		material_volumetric->render(camera, node_list[0]->model,node_list[0]->mesh);
 	}
 		
