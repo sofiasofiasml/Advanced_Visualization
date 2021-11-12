@@ -44,14 +44,20 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 	camera->setPerspective(45.f,window_width/(float)window_height,0.1f,10000.f); //set the projection, we want to be perspective
 
 	material_basic = new yourmaterial();
-	//material_volumetric = new volumematerial();
-
+	material_volumetric = new volumematerial();
+	
 	material_pbr = new yourpbr();
 	{
 		StandardMaterial* mat = new StandardMaterial();
 		SceneNode* node = new SceneNode("Visible node");
 		node->material = mat;
 
+		SceneNode* cube_node = new SceneNode("Visible node");
+		cube_node->mesh = new Mesh();
+		cube_node->mesh->createCube();
+		cube_node->model.translate(0, 1, 0);
+		cube_node->material = mat;
+		//node_list.push_back(cube_node);
 		//Mesh
 		material_basic->meshSphere = Mesh::Get("data/meshes/sphere.obj");
 		material_basic->meshHelmet = Mesh::Get("data/models/helmet/helmet.obj");
@@ -91,9 +97,12 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 		material_basic->shader_volume = Shader::Get("data/shaders/basic.vs", "data/shaders/volume_skeleton.fs");
 		
 		node->material->texture = material_pbr->tex_albedo[0]; // sample2d in shader
-		node->mesh = material_basic->meshHelmet;
+		//node->mesh = material_basic->meshHelmet;
+		node->mesh = material_volumetric->mesh;
 		node->model.translate(0, 1, 0);
 		node_list.push_back(node);
+
+
 	}
 	
 	directional = new Light();
@@ -115,65 +124,62 @@ void Application::render(void)
 	camera->enable();
 	
 
-	//Skybox
-	Matrix44 skybox_model; 
+	if (material_basic->eMaterial != material_basic->VOLUME) {
+		skybox->render(skybox->mesh, camera); 
+		
+		//set flags
+		glEnable(GL_DEPTH_TEST);	
+		glCullFace(GL_FRONT);
+		glFrontFace(GL_CW);
+		if(material_basic->eMaterial == material_basic->PBR)
+			glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	skybox_model.translate(camera->eye.x, camera->eye.y, camera->eye.z);
-	glDisable(GL_DEPTH_TEST); 
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
+	//if ira aqui despues de añadir skybox a 0
+		for (size_t i = 0; i < node_list.size(); i++) {
+			Matrix44 model;
+			model.translate(0, 1, 0);
 
-	skybox->render(skybox->mesh, skybox_model, camera); 
-	if (skybox->now_sky != skybox->before_sky)
-		skybox->loadCubemap();
-	
-	//set flags
-	glEnable(GL_DEPTH_TEST);	
-	glCullFace(GL_FRONT);
-	glFrontFace(GL_CW);
-	if(material_basic->eMaterial == material_basic->PBR)
-		glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			if (material_basic->eMaterial == material_basic->TEXTURE)
+				node_list[i]->material->shader = material_basic->shader_flat;
+			else if (material_basic->eMaterial == material_basic->PHONG)
+				node_list[i]->material->shader = material_basic->shader_phong;
+			else if (material_basic->eMaterial == material_basic->REFLECTIVE)
+				node_list[i]->material->shader = material_basic->shader_reflective;
+			else if (material_basic->eMaterial == material_basic->PBR)
+				node_list[i]->material->shader = material_basic->shader_pbr;
+			node_list[i]->render(camera);
 
-	for (size_t i = 0; i < node_list.size(); i++) {
-		Matrix44 model;
-		model.translate(0, 1, 0);
+			if(render_wireframe)
+				node_list[i]->renderWireframe(camera);
 
-		if (material_basic->eMaterial == material_basic->TEXTURE)
-			node_list[i]->material->shader = material_basic->shader_flat;
-		else if (material_basic->eMaterial == material_basic->PHONG)
-			node_list[i]->material->shader = material_basic->shader_phong;
-		else if (material_basic->eMaterial == material_basic->REFLECTIVE)
-			node_list[i]->material->shader = material_basic->shader_reflective;
-		else if (material_basic->eMaterial == material_basic->PBR)
-			node_list[i]->material->shader = material_basic->shader_pbr;
-		/*else if (material_basic->eMaterial == material_basic->VOLUME)
-			node_list[i]->material->shader = material_basic->shader_volume;*/
-		node_list[i]->render(camera);
-
-		if(render_wireframe)
-			node_list[i]->renderWireframe(camera);
-
-		//We change the mesh if we change the imGui options
-		if(material_basic->eMaterial != material_basic->VOLUME){
-			if (node_list[i]->mesh_selected == 0)
-				node_list[i]->mesh = material_basic->meshHelmet;
-			else if (node_list[i]->mesh_selected == 1) {
-				node_list[i]->mesh = material_basic->meshLantern;
-				model.scale(0.02, 0.02, 0.02);
-			}
-			else if (node_list[i]->mesh_selected == 2)
-				node_list[i]->mesh = material_basic->meshSphere;
-		}
+			//We change the mesh if we change the imGui options
+			/*if(material_basic->eMaterial != material_basic->VOLUME){ //DESCOMENTAR CUANDO FUNCIONE
+				if (node_list[i]->mesh_selected == 0)
+					node_list[i]->mesh = material_basic->meshHelmet;
+				else if (node_list[i]->mesh_selected == 1) {
+					node_list[i]->mesh = material_basic->meshLantern;
+					model.scale(0.02, 0.02, 0.02);
+				}
+				else if (node_list[i]->mesh_selected == 2)
+					node_list[i]->mesh = material_basic->meshSphere;
+			}*/
 		
 
-		//We change the texture if we change the imGui options
-		node_list[i]->material->texture = material_pbr->tex_albedo[material_basic->eTexture];
-		node_list[i]->model = model;
+			//We change the texture if we change the imGui options
+			node_list[i]->material->texture = material_pbr->tex_albedo[material_basic->eTexture];
+			node_list[i]->model = model;
 
+		}
 	}
-	if (material_basic->eMaterial == material_basic->PBR)
-		glDisable(GL_BLEND);
+	else {
+		glEnable(GL_DEPTH_TEST);
+		glCullFace(GL_FRONT);
+		glFrontFace(GL_CW);
+		material_volumetric->render(camera, node_list[0]->model,node_list[0]->mesh);
+	}
+		
+	glDisable(GL_BLEND);
 
 }
 

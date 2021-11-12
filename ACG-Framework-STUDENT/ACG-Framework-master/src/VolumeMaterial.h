@@ -22,6 +22,7 @@ public:
 	volumematerial();
 
 	void SetUniforms(Camera* camera, Matrix44 model);
+	void render(Camera* camera, Matrix44 model, Mesh* mesh);
 	void loadVolumeImg();
 	void renderInMenu();
 };

@@ -3,6 +3,7 @@
 volumematerial::volumematerial()
 {
 	this->shader  = Shader::Get("data/shaders/basic.vs", "data/shaders/volume_skeleton.fs");
+	this->mesh = new Mesh();
 	this->mesh->createCube();
 	this->textureFoot = new Texture();
 	this->textureBonsai = new Texture();
@@ -12,6 +13,7 @@ volumematerial::volumematerial()
 	this->volumeTea = new Volume();
 	this->rayStep = 0.1;
 	this->volume = this->volumeFoot;
+	this->loadVolumeImg();
 }
 
 
@@ -23,6 +25,25 @@ void volumematerial::SetUniforms(Camera* camera, Matrix44 model)
 
 	if ( this->textureFoot)
 		this->shader->setUniform("u_texture", this->textureFoot, 0);
+
+}
+
+void volumematerial::render(Camera* camera, Matrix44 model, Mesh* mesh)
+{
+	if (this->mesh && this->shader)
+	{
+		//enable shader
+		this->shader->enable();
+
+		//upload uniforms
+		this->SetUniforms(camera, model);
+
+		//do the draw call
+		mesh->render(GL_TRIANGLES);
+
+		//disable shader
+		this->shader->disable();
+	}
 
 }
 

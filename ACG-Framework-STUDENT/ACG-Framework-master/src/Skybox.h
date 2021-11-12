@@ -20,7 +20,7 @@ public:
 	YourSkybox(); 
 
 	void setUniforms(Camera* camera, Matrix44 model);
-	void render(Mesh* mesh, Matrix44 model, Camera* camera);
+	void render(Mesh* mesh, Camera* camera);
 	void loadCubemap();
 	void renderInMenu(); 
 	void loadHdr(const char* folder);

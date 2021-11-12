@@ -46,17 +46,22 @@ void YourSkybox::setUniforms(Camera* camera, Matrix44 model)
 	if (this->tex_skybox)
 		this->shader_skybox->setUniform("u_texture", this->tex_skybox, 15);
 }
-void YourSkybox::render(Mesh* mesh, Matrix44 model, Camera* camera)
+void YourSkybox::render(Mesh* mesh, Camera* camera)
 {
 	//Shader* shader = Application::instance->material_basic->shader; 
+	Matrix44 skybox_model;
 
+	skybox_model.translate(camera->eye.x, camera->eye.y, camera->eye.z);
+	glDisable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 	if (mesh && this->shader_skybox)
 	{
 		//enable shader
 		this->shader_skybox->enable();
 
 		//upload uniforms
-		setUniforms(camera, model);
+		setUniforms(camera, skybox_model);
 
 		//do the draw call
 		mesh->render(GL_TRIANGLES);
@@ -64,6 +69,8 @@ void YourSkybox::render(Mesh* mesh, Matrix44 model, Camera* camera)
 		//disable shader
 		this->shader_skybox->disable();
 	}
+	if (this->now_sky != this->before_sky)
+		this->loadCubemap();
 }
 void YourSkybox::renderInMenu()
 {
