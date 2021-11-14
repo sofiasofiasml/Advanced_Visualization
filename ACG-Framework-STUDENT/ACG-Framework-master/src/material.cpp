@@ -67,7 +67,11 @@ void StandardMaterial::setUniforms(Camera* camera, Matrix44 model)
 	this->shader->setUniform1("u_is_jittering", volumeMat->is_jittering);
 	this->shader->setUniform1("u_is_tf", volumeMat->is_tf);
 	this->shader->setUniform1("u_is_clip", volumeMat->is_clipping);
-	//this->shader->setUniform4("u_clipping", volumeMat->clip);
+	this->shader->setUniform("u_clipping", volumeMat->clip);
+	this->shader->setUniform1("u_is_iso", volumeMat->is_iso);
+	if(yourMat->eMaterial == yourMat->VOLUME)
+		this->shader->setUniform("u_alpha", volumeMat->alpha);
+
 	if (yourMat->eMaterial == yourMat->VOLUME && volumeMat->noise)
 		this->shader->setUniform("u_noise", volumeMat->noise, 16);
 

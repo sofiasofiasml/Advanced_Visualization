@@ -13,7 +13,10 @@ uniform int u_brightness;
 uniform int u_is_jittering;
 uniform int u_is_tf;
 uniform sampler2D u_noise;
-
+uniform int u_is_clip;
+uniform vec4 u_clipping;
+uniform int u_is_iso;
+uniform float u_alpha;
 
 vec4 colorFinal;
 vec3 rayDir;
@@ -24,6 +27,10 @@ vec2 noise_coord;
 float d; 
 float noise;
 
+float isInside(){
+	float result =  u_clipping.x * samplePos.x + u_clipping.y * samplePos.y + u_clipping.z * samplePos.y + u_clipping.a ;
+	return result;
+}
 void main(){
 	// 1. Ray setup
 	colorFinal = vec4(0);
@@ -32,13 +39,11 @@ void main(){
 	samplePos = v_position; //entry point
 	
 	//jittering
-	noise_coord = gl_FragCoord.xy / 128; //128 texture width
+	noise_coord = gl_FragCoord.xy/128; //128 texture width
 	noise = texture2D(u_noise, noise_coord).x;
 
 	if (u_is_jittering == 1)
 		samplePos += noise * rayDir;
-
-
 
 	// Ray loop
 	for(int i=0; i<MAX_ITERATIONS; i++)
@@ -48,11 +53,26 @@ void main(){
 		d = texture3D(u_texture,coord).x;
 
 		// 3. Classification
-		vec4 sampleColor = vec4(d,d,d,d);
-		sampleColor.rgb *= sampleColor.a;
+		vec4 sampleColor ;
+		if(u_is_tf == 1){
+			sampleColor = vec4(d,d,1-d,d*d);
+			sampleColor.rgb *= sampleColor.a* u_alpha;
+		}
+			
+		else {
+			sampleColor = vec4(d,d,d,d);
+			sampleColor.rgb *= sampleColor.a;
+		}
+			
 		// 4. Composition
-		colorFinal += u_rayStep * (1.0 - colorFinal.a) * sampleColor;
-
+		
+		if(u_is_clip == 1)
+		{
+			if(isInside()<0 || isInside()==0) // si el punto se encuentra dentro del plano lo pintamos, si no se encuentra no lo pintamos
+				colorFinal += u_rayStep * (1.0 - colorFinal.a) * sampleColor;
+		}	
+		else
+			colorFinal += u_rayStep * (1.0 - colorFinal.a) * sampleColor;
 		// 5. Next sample
 		samplePos += step_vector;
 
@@ -60,13 +80,14 @@ void main(){
 		//next sample its outside the volume
 		if (colorFinal.a == 1 || abs(samplePos.x)>1 || abs(samplePos.y)>1 || abs(samplePos.z)>1)
 			break;
-
+		
+		
+		
 	}
 	//7. Final color 
 
-	//Transfer function
-	//if (u_is_tf == 1)
-	//	colorFinal *= texture_tf;
+	//if(colorFinal.x < 0.01) //podemos eliminar el "fondo" asi
+	//	discard;
 	colorFinal*= u_color_factor * u_brightness;
-	gl_FragColor = vec4(colorFinal.rgb,1.0); //Añadir u_color and brightness en imgui   
+	gl_FragColor = vec4(colorFinal.rgb,1.0);  
 }

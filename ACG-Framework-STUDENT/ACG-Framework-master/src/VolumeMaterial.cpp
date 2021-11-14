@@ -12,14 +12,16 @@ volumematerial::volumematerial()
 	this->noise = Texture::Get("data/blueNoise.png");
 	this->texture = new Texture();
 	this->is_tf = 0;
+	this->alpha = 1;
+	this->is_iso = 0;
 	this->is_clipping = 0;
-	this->clip = new Vector4(0,0,0,0);
+	this->clip = vec4(0,0,0,0);
 	this->is_jittering = 0;
 	this->volumeFoot = new Volume();
 	this->volumeBonsai = new Volume();
 	this->volumeTea = new Volume();
 	this->rayStep = 0.1;
-	this->brightness = 1;
+	this->brightness = 4;
 	this->loadVolumeImg();
 	this->eImages = this->FOOT;
 	this->texture = this->textureFoot;
@@ -57,8 +59,11 @@ void volumematerial::renderInMenu()
 	ImGui::Checkbox("Jittering", (bool*)&this->is_jittering);
 	ImGui::Checkbox("Transfer function", (bool*)&this->is_tf);
 	ImGui::Checkbox("Clipping", (bool*)&this->is_clipping);
-	if(this->is_clipping==1)
-		ImGui::DragFloat4("Clipping vector", &this->clip->x, 0.1f, -1, 1);
+	ImGui::Checkbox("Isosurfaces", (bool*)&this->is_iso);
+	if (this->is_clipping == 1)
+		ImGui::DragFloat4("Clipping vector", &this->clip.x, 0.1f, -1, 1);
+	if(this->is_tf == 1)
+		ImGui::DragFloat("Alpha", &this->alpha, 0.01, 0, 1);
 
 	if (this->eImages == 0)
 		this->texture = this->textureFoot;

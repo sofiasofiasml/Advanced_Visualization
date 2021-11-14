@@ -23,10 +23,16 @@ public:
 	Shader* shader;
 	float rayStep;
 	int brightness;
+	//Jittering
 	int is_jittering;
+	//Transfer function
 	int is_tf;
+	float alpha;
+	//Clipping
 	int is_clipping;
-	Vector4* clip;
+	vec4 clip;
+	//Isosurfaces
+	int is_iso;
 
 	volumematerial();
 
