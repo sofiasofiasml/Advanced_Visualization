@@ -10,19 +10,36 @@ uniform vec3 u_camera_position;
 uniform sampler3D u_texture;
 uniform float u_rayStep;
 uniform int u_brightness;
+uniform int u_is_jittering;
+uniform int u_is_tf;
+uniform sampler2D u_noise;
+
 
 vec4 colorFinal;
 vec3 rayDir;
 vec3 samplePos;
-vec3 step_vector;
-float d; 
 vec3 coord; 
+vec3 step_vector;
+vec2 noise_coord;
+float d; 
+float noise;
+
 void main(){
 	// 1. Ray setup
 	colorFinal = vec4(0);
-	rayDir = normalize(-u_camera_position+v_position);
+	rayDir = normalize(v_position-u_camera_position);
 	step_vector = u_rayStep * rayDir; //pos que cambiaremos
 	samplePos = v_position; //entry point
+	
+	//jittering
+	noise_coord = gl_FragCoord.xy / 128; //128 texture width
+	noise = texture2D(u_noise, noise_coord).x;
+
+	if (u_is_jittering == 1)
+		samplePos += noise * rayDir;
+
+
+
 	// Ray loop
 	for(int i=0; i<MAX_ITERATIONS; i++)
 	{
@@ -32,9 +49,8 @@ void main(){
 
 		// 3. Classification
 		vec4 sampleColor = vec4(d,d,d,d);
-
+		sampleColor.rgb *= sampleColor.a;
 		// 4. Composition
-
 		colorFinal += u_rayStep * (1.0 - colorFinal.a) * sampleColor;
 
 		// 5. Next sample
@@ -46,7 +62,11 @@ void main(){
 			break;
 
 	}
-	//7. Final color colorFinal
+	//7. Final color 
+
+	//Transfer function
+	//if (u_is_tf == 1)
+	//	colorFinal *= texture_tf;
 	colorFinal*= u_color_factor * u_brightness;
 	gl_FragColor = vec4(colorFinal.rgb,1.0); //Añadir u_color and brightness en imgui   
 }

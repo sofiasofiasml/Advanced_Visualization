@@ -18,10 +18,15 @@ public:
 	Texture* textureFoot;
 	Texture* textureBonsai;
 	Texture* textureTea;
+	Texture* noise;
 
 	Shader* shader;
 	float rayStep;
 	int brightness;
+	int is_jittering;
+	int is_tf;
+	int is_clipping;
+	Vector4* clip;
 
 	volumematerial();
 
