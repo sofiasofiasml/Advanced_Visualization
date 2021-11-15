@@ -1,7 +1,5 @@
 #define MAX_ITERATIONS 500
 
-varying vec2 v_uv;
-varying vec3 v_normal;
 varying vec3 v_position;
 
 uniform vec4 u_color;
@@ -17,6 +15,8 @@ uniform int u_is_clip;
 uniform vec4 u_clipping;
 uniform int u_is_iso;
 uniform float u_alpha;
+uniform float h; 
+uniform vec3 u_light_dir; 
 
 vec4 colorFinal;
 vec3 rayDir;
@@ -26,7 +26,18 @@ vec3 step_vector;
 vec2 noise_coord;
 float d; 
 float noise;
+vec3 normal; 
+vec3 L; 
 
+float NdotL;
+
+vec3 gradient(vec3 coord){
+	float x = texture3D(u_texture, coord + vec3(h, 0.0, 0.0)).x - texture3D(u_texture, coord - vec3(h, 0.0, 0.0)).x;
+	float y = texture3D(u_texture, coord + vec3(0.0, h, 0.0)).x - texture3D(u_texture, coord - vec3(0.0, h, 0.0)).x;	
+	float z = texture3D(u_texture, coord + vec3(0.0, 0.0, h)).x - texture3D(u_texture, coord - vec3(0.0, 0.0, h)).x;
+	vec3 gradient = vec3(x,y,z)/(2.0*h);
+	return gradient;
+}
 float isInside(){
 	float result =  u_clipping.x * samplePos.x + u_clipping.y * samplePos.y + u_clipping.z * samplePos.y + u_clipping.a ;
 	return result;
@@ -44,7 +55,8 @@ void main(){
 
 	if (u_is_jittering == 1)
 		samplePos += noise * rayDir;
-
+	L = u_light_dir; 
+	NdotL = 1; 
 	// Ray loop
 	for(int i=0; i<MAX_ITERATIONS; i++)
 	{
@@ -63,16 +75,23 @@ void main(){
 			sampleColor = vec4(d,d,d,d);
 			sampleColor.rgb *= sampleColor.a;
 		}
-			
+		if(u_is_iso == 1)
+		{
+			normal = normalize(gradient(coord));
+			NdotL = (dot(normal,L)+1.0)/2.0; //Loal coordinates
+		}
 		// 4. Composition
 		
 		if(u_is_clip == 1)
 		{
-			if(isInside()<0 || isInside()==0) // si el punto se encuentra dentro del plano lo pintamos, si no se encuentra no lo pintamos
-				colorFinal += u_rayStep * (1.0 - colorFinal.a) * sampleColor;
+			if(isInside()<=0) // si el punto se encuentra dentro del plano lo pintamos, si no se encuentra no lo pintamos
+				colorFinal += u_rayStep * (1.0 - colorFinal.a) * sampleColor * NdotL;
 		}	
-		else
+		else{
 			colorFinal += u_rayStep * (1.0 - colorFinal.a) * sampleColor;
+			//colorFinal+= NdotL; 
+		}	
+			 
 		// 5. Next sample
 		samplePos += step_vector;
 
@@ -80,8 +99,6 @@ void main(){
 		//next sample its outside the volume
 		if (colorFinal.a == 1 || abs(samplePos.x)>1 || abs(samplePos.y)>1 || abs(samplePos.z)>1)
 			break;
-		
-		
 		
 	}
 	//7. Final color 

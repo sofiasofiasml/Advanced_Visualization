@@ -33,7 +33,7 @@ public:
 	vec4 clip;
 	//Isosurfaces
 	int is_iso;
-
+	float h; 
 	volumematerial();
 
 	void SetUniforms(Camera* camera, Matrix44 model);

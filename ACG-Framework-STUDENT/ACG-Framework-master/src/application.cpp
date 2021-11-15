@@ -173,7 +173,6 @@ void Application::render(void)
 
 	}
 	
-		
 	glDisable(GL_BLEND);
 
 }
