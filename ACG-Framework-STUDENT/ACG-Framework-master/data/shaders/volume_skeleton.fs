@@ -1,5 +1,6 @@
 #define MAX_ITERATIONS 500
 
+uniform mat4 u_model;
 varying vec3 v_position;
 varying vec3 v_normal;
 uniform vec4 u_color;
@@ -45,10 +46,15 @@ float isInside(){
 void main(){
 	// 1. Ray setup
 	colorFinal = vec4(0);
-	rayDir = normalize(v_position-u_camera_position);
+	mat3 model_local = inverse(mat3(u_model));  
+
+	//Variables of the Camera of 0 - 1
+	vec3 camera_pos_local_01 = ((u_camera_position * model_local)+1)/2; 
+	vec3 v_position_01 = (v_position+1)/2;  
+
+	rayDir = normalize(v_position_01-camera_pos_local_01);
 	step_vector = u_rayStep * rayDir; //pos que cambiaremos
 	samplePos = v_position; //entry point
-	
 	//jittering
 	noise_coord = gl_FragCoord.xy/128; //128 texture width
 	noise = texture2D(u_noise, noise_coord).x;
