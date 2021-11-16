@@ -129,9 +129,11 @@ void Application::render(void)
 	glEnable(GL_DEPTH_TEST);	
 	glCullFace(GL_FRONT);
 	glFrontFace(GL_CW);
-	if(material_basic->eMaterial == material_basic->PBR)
+	if (material_basic->eMaterial == material_basic->PBR) {
 		glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	}
+
 
 //if ira aqui despues de añadir skybox a 0
 	for (size_t i = 0; i < node_list.size(); i++) {
@@ -154,7 +156,7 @@ void Application::render(void)
 			node_list[i]->renderWireframe(camera);
 
 		//We change the mesh if we change the imGui options
-		if(material_basic->eMaterial != material_basic->VOLUME){ //DESCOMENTAR CUANDO FUNCIONE
+		if(material_basic->eMaterial != material_basic->VOLUME){
 			if (node_list[i]->mesh_selected == 0)
 				node_list[i]->mesh = material_basic->meshHelmet;
 			else if (node_list[i]->mesh_selected == 1) {

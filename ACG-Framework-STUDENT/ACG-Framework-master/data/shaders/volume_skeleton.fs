@@ -2,7 +2,6 @@
 
 uniform mat4 u_model;
 varying vec3 v_position;
-varying vec3 v_normal;
 uniform vec4 u_color;
 uniform vec4 u_color_factor;
 uniform vec3 u_camera_position;
@@ -46,31 +45,29 @@ float isInside(){
 void main(){
 	// 1. Ray setup
 	colorFinal = vec4(0);
+
+	//Variables at local coord
 	mat3 model_local = inverse(mat3(u_model));  
+	vec3 camera_pos_local = u_camera_position * model_local;  
 
-	//Variables of the Camera of 0 - 1
-	vec3 camera_pos_local_01 = ((u_camera_position * model_local)+1)/2; 
-	vec3 v_position_01 = (v_position+1)/2;  
-
-	rayDir = normalize(v_position_01-camera_pos_local_01);
+	rayDir = normalize(v_position-camera_pos_local);
 	step_vector = u_rayStep * rayDir; //pos que cambiaremos
 	samplePos = v_position; //entry point
+
 	//jittering
 	noise_coord = gl_FragCoord.xy/128; //128 texture width
 	noise = texture2D(u_noise, noise_coord).x;
 
 	if (u_is_jittering == 1)
-		samplePos += noise * rayDir;
-	L = u_light_dir; 
-	normal = normalize(v_normal); 
-	NdotL = max(dot(normal, L), 0.0);  
+		samplePos += noise  * step_vector ;
+	L =  u_light_dir * model_local;
+	NdotL = 1;  
 	// Ray loop
 	for(int i=0; i<MAX_ITERATIONS; i++)
 	{
 		// 2. Volume sampling
 		coord = (samplePos+1)/2; // Ahora va de 0 a 1
 		d = texture3D(u_texture,coord).x;
-
 		// 3. Classification
 		vec4 sampleColor ;
 		if(u_is_tf == 1){
@@ -82,22 +79,21 @@ void main(){
 			sampleColor = vec4(d,d,d,d);
 			sampleColor.rgb *= sampleColor.a;
 		}
-		if(u_is_iso == 1)
-		{
-			normal = normalize(gradient(coord));
-			NdotL = (dot(normal,L)+1.0)/2.0; //Loal coordinates
-		}
 		// 4. Composition
 		
+
+		if(u_is_iso == 1)
+		{
+			normal = -gradient(coord);
+			NdotL = dot(normal,L); 
+		}
 		if(u_is_clip == 1)
 		{
 			if(isInside()<=0) // si el punto se encuentra dentro del plano lo pintamos, si no se encuentra no lo pintamos
 				colorFinal += u_rayStep * (1.0 - colorFinal.a) * sampleColor * NdotL;
 		}	
 		else{
-			colorFinal += u_rayStep * (1.0 - colorFinal.a) * sampleColor;
-			//colorFinal += NdotL * (1 - colorFinal.a); //NS 
-			//colorFinal.a = 1;  //salga del for
+			colorFinal += (1.0 - colorFinal.a) * sampleColor * NdotL;// u_rayStep * (1.0 - colorFinal.a) * sampleColor * NdotL;
 		}	
 			 
 		// 5. Next sample
@@ -110,10 +106,6 @@ void main(){
 		
 	}
 	//7. Final color 
-	if(u_is_clip != 1)
-		colorFinal *= NdotL * (1 - colorFinal.a);
-	//if(colorFinal.x < 0.01) //podemos eliminar el "fondo" asi
-	//	discard;
 	colorFinal*= u_color_factor * u_brightness;
 	gl_FragColor = vec4(colorFinal.rgb,1.0);  
 }

@@ -47,9 +47,9 @@ void volumematerial::loadVolumeImg()
 	this->volumeBonsai->loadPNG("data/volumes/bonsai_16_16.png");
 	this->volumeTea->loadPNG("data/volumes/teapot_16_16.png");
 
-	this->textureFoot->create3DFromVolume(this->volumeFoot);
-	this->textureBonsai->create3DFromVolume(this->volumeBonsai);
-	this->textureTea->create3DFromVolume(this->volumeTea);
+	this->textureFoot->create3DFromVolume(this->volumeFoot, GL_CLAMP_TO_EDGE);
+	this->textureBonsai->create3DFromVolume(this->volumeBonsai, GL_CLAMP_TO_EDGE);
+	this->textureTea->create3DFromVolume(this->volumeTea, GL_CLAMP_TO_EDGE);
 }
 
 void volumematerial::renderInMenu()

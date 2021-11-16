@@ -17,7 +17,7 @@
 	 yourmaterial* mat = Application::instance->material_basic;
 
 	ImGui::DragFloat("Intensity", &this->intensity, 0.01f, 0.1f, 1.0f);
-	ImGui::DragFloat3("Direction", &this->direction.x, 0.1f, -10, 10);
+	ImGui::DragFloat3("Direction", &this->direction.x, 0.1f, -1, 1);
 	ImGui::ColorEdit4("Color", &this->color.x);
 
 	if (mat->eMaterial == mat->PHONG) {
