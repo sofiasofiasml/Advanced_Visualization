@@ -1,7 +1,7 @@
 #define MAX_ITERATIONS 500
 
 varying vec3 v_position;
-
+varying vec3 v_normal;
 uniform vec4 u_color;
 uniform vec4 u_color_factor;
 uniform vec3 u_camera_position;
@@ -56,7 +56,8 @@ void main(){
 	if (u_is_jittering == 1)
 		samplePos += noise * rayDir;
 	L = u_light_dir; 
-	NdotL = 1; 
+	normal = normalize(v_normal); 
+	NdotL = max(dot(normal, L), 0.0);  
 	// Ray loop
 	for(int i=0; i<MAX_ITERATIONS; i++)
 	{
@@ -89,7 +90,8 @@ void main(){
 		}	
 		else{
 			colorFinal += u_rayStep * (1.0 - colorFinal.a) * sampleColor;
-			//colorFinal+= NdotL; 
+			//colorFinal += NdotL * (1 - colorFinal.a); //NS 
+			//colorFinal.a = 1;  //salga del for
 		}	
 			 
 		// 5. Next sample
@@ -102,7 +104,8 @@ void main(){
 		
 	}
 	//7. Final color 
-
+	if(u_is_clip != 1)
+		colorFinal *= NdotL * (1 - colorFinal.a);
 	//if(colorFinal.x < 0.01) //podemos eliminar el "fondo" asi
 	//	discard;
 	colorFinal*= u_color_factor * u_brightness;
