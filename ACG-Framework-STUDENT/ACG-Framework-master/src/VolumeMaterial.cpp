@@ -14,8 +14,8 @@ volumematerial::volumematerial()
 	this->is_tf = 0;
 	this->alpha = 1;
 	this->is_iso = 0;
-	this->h = 1; 
-	this->threshold = 0;
+	this->h = 0.03; 
+	this->threshold = 0.01;
 	this->is_clipping = 0;
 	this->clip = vec4(0,0,0,0);
 	this->is_jittering = 0;
@@ -67,8 +67,8 @@ void volumematerial::renderInMenu()
 	if(this->is_tf == 1)
 		ImGui::DragFloat("Alpha", &this->alpha, 0.01, 0, 1);
 	if (this->is_iso == 1){
-		ImGui::DragFloat("H", &this->h, 0.01, 0, 1);
-		ImGui::DragFloat("Threshold", &this->threshold, 0.01, 0, 1);
+		ImGui::DragFloat("H", &this->h, 0.01, 0.01, 1);
+		ImGui::DragFloat("Threshold", &this->threshold, 0.01, 0.01, 1);
 	}
 		
 	if (this->eImages == 0)

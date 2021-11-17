@@ -94,7 +94,7 @@ void main(){
 		if(u_is_iso == 1)
 		{
 			if(d >= u_threshold){
-				normal = gradient(coord);
+				normal =normalize(gradient(coord));
 				NdotL = dot(normal,L); 
 				colorFinal += NdotL* (1-colorFinal.a);
 				colorFinal.a = 1;
