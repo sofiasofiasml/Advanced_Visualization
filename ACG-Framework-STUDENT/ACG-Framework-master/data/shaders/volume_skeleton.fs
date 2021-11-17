@@ -16,6 +16,7 @@ uniform vec4 u_clipping;
 uniform int u_is_iso;
 uniform float u_alpha;
 uniform float h; 
+uniform float u_threshold; 
 uniform vec3 u_light_dir; 
 
 vec4 colorFinal;
@@ -36,7 +37,7 @@ vec3 gradient(vec3 coord){
 	float y = texture3D(u_texture, coord + vec3(0.0, h, 0.0)).x - texture3D(u_texture, coord - vec3(0.0, h, 0.0)).x;	
 	float z = texture3D(u_texture, coord + vec3(0.0, 0.0, h)).x - texture3D(u_texture, coord - vec3(0.0, 0.0, h)).x;
 	vec3 gradient = vec3(x,y,z)/(2.0*h);
-	return gradient;
+	return -gradient;
 }
 float isInside(){
 	float result =  u_clipping.x * samplePos.x + u_clipping.y * samplePos.y + u_clipping.z * samplePos.y + u_clipping.a ;
@@ -82,25 +83,29 @@ void main(){
 		// 4. Composition
 		
 
-		if(u_is_iso == 1)
-		{
-			normal = -gradient(coord);
-			NdotL = dot(normal,L); 
-		}
 		if(u_is_clip == 1)
 		{
 			if(isInside()<=0) // si el punto se encuentra dentro del plano lo pintamos, si no se encuentra no lo pintamos
-				colorFinal += u_rayStep * (1.0 - colorFinal.a) * sampleColor * NdotL;
+				colorFinal += u_rayStep * (1.0 - colorFinal.a) * sampleColor ;
 		}	
-		else{
-			colorFinal += (1.0 - colorFinal.a) * sampleColor * NdotL;// u_rayStep * (1.0 - colorFinal.a) * sampleColor * NdotL;
-		}	
-			 
+		else
+			colorFinal += u_rayStep* (1.0 - colorFinal.a) * sampleColor;// u_rayStep * (1.0 - colorFinal.a) * sampleColor * NdotL;
+		
+		if(u_is_iso == 1)
+		{
+			if(d >= u_threshold){
+				normal = gradient(coord);
+				NdotL = dot(normal,L); 
+				colorFinal += NdotL* (1-colorFinal.a);
+				colorFinal.a = 1;
+
+			}
+			
+		}
 		// 5. Next sample
 		samplePos += step_vector;
 
 		// 6. Early termination 
-		//next sample its outside the volume
 		if (colorFinal.a == 1 || abs(samplePos.x)>1 || abs(samplePos.y)>1 || abs(samplePos.z)>1)
 			break;
 		

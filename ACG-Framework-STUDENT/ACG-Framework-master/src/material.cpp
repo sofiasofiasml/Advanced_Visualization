@@ -70,6 +70,7 @@ void StandardMaterial::setUniforms(Camera* camera, Matrix44 model)
 	this->shader->setUniform("u_clipping", volumeMat->clip);
 	this->shader->setUniform1("u_is_iso", volumeMat->is_iso);
 	this->shader->setUniform("h", volumeMat->h);
+	this->shader->setUniform("u_threshold", volumeMat->threshold);
 	if(yourMat->eMaterial == yourMat->VOLUME)
 		this->shader->setUniform("u_alpha", volumeMat->alpha);
 

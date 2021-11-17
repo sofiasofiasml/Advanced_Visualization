@@ -34,6 +34,7 @@ public:
 	//Isosurfaces
 	int is_iso;
 	float h; 
+	float threshold;
 	volumematerial();
 
 	void SetUniforms(Camera* camera, Matrix44 model);
