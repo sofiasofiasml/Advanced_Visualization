@@ -15,6 +15,8 @@ volumematerial::volumematerial()
 	this->alpha = 1;
 	this->is_iso = 0;
 	this->h = 0.03; 
+	this->density1 = 0.5;
+	this->density2 = 1;
 	this->threshold = 0.01;
 	this->is_clipping = 0;
 	this->clip = vec4(0,0,0,0);
@@ -23,7 +25,7 @@ volumematerial::volumematerial()
 	this->volumeBonsai = new Volume();
 	this->volumeTea = new Volume();
 	this->rayStep = 0.02;
-	this->brightness = 1;
+	this->brightness = 4;
 	this->loadVolumeImg();
 	this->eImages = this->FOOT;
 	this->texture = this->textureFoot;
@@ -64,8 +66,12 @@ void volumematerial::renderInMenu()
 	ImGui::Checkbox("Isosurfaces", (bool*)&this->is_iso);
 	if (this->is_clipping == 1)
 		ImGui::DragFloat4("Clipping vector", &this->clip.x, 0.1f, -1, 1);
-	if(this->is_tf == 1)
+	if(this->is_tf == 1){
 		ImGui::DragFloat("Alpha", &this->alpha, 0.01, 0, 1);
+		ImGui::DragFloat("Density 1", &this->density1, 0.01, -5, 1);
+		ImGui::DragFloat("Density 2", &this->density2, 0.01, -5, 1);
+	}
+		
 	if (this->is_iso == 1){
 		ImGui::DragFloat("H", &this->h, 0.01, 0.01, 1);
 		ImGui::DragFloat("Threshold", &this->threshold, 0.01, 0.01, 1);

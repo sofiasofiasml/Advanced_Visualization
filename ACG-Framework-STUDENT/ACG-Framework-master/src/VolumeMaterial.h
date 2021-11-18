@@ -28,6 +28,8 @@ public:
 	//Transfer function
 	int is_tf;
 	float alpha;
+	float density1;
+	float density2;
 	//Clipping
 	int is_clipping;
 	vec4 clip;

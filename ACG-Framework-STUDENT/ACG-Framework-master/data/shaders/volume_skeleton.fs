@@ -18,6 +18,8 @@ uniform float u_alpha;
 uniform float h; 
 uniform float u_threshold; 
 uniform vec3 u_light_dir; 
+uniform float u_density1;
+uniform float u_density2;
 
 vec4 colorFinal;
 vec3 rayDir;
@@ -72,14 +74,19 @@ void main(){
 		// 3. Classification
 		vec4 sampleColor ;
 		if(u_is_tf == 1){
-			sampleColor = vec4(d,d,1-d,d*d);
-			sampleColor.rgb *= sampleColor.a* u_alpha;
-		}
+			if (d<u_density1) 
+				sampleColor=vec4(1,0,0,d);
+			else if (d<u_density2) 
+				sampleColor=vec4(0,1,0,d);
+			else 
+				sampleColor = vec4(1,1,1,d);
+			}
 			
 		else {
 			sampleColor = vec4(d,d,d,d);
-			sampleColor.rgb *= sampleColor.a;
 		}
+		sampleColor.rgb *= sampleColor.a;
+
 		// 4. Composition
 		
 
@@ -89,7 +96,7 @@ void main(){
 				colorFinal += u_rayStep * (1.0 - colorFinal.a) * sampleColor ;
 		}	
 		else
-			colorFinal += u_rayStep* (1.0 - colorFinal.a) * sampleColor;// u_rayStep * (1.0 - colorFinal.a) * sampleColor * NdotL;
+			colorFinal += u_rayStep* (1.0 - colorFinal.a) * sampleColor;
 		
 		if(u_is_iso == 1)
 		{
@@ -100,6 +107,9 @@ void main(){
 				colorFinal.a = 1;
 
 			}
+			
+		}
+		if(u_is_tf ==1 ){
 			
 		}
 		// 5. Next sample
