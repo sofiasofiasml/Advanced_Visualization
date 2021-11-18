@@ -75,7 +75,7 @@ void main(){
 		vec4 sampleColor ;
 		if(u_is_tf == 1){
 			if (d<u_density1) 
-				sampleColor=vec4(1,0,0,d);
+				sampleColor=vec4(1,0,0,d*u_alpha);
 			else if (d<u_density2) 
 				sampleColor=vec4(0,1,0,d);
 			else 
