@@ -31,18 +31,19 @@ float d;
 float noise;
 vec3 normal; 
 vec3 L; 
-
+vec4 sampleColor ;
 float NdotL;
 
 vec3 gradient(vec3 coord){
-	float x = texture3D(u_texture, coord + vec3(h, 0.0, 0.0)).x - texture3D(u_texture, coord - vec3(h, 0.0, 0.0)).x;
-	float y = texture3D(u_texture, coord + vec3(0.0, h, 0.0)).x - texture3D(u_texture, coord - vec3(0.0, h, 0.0)).x;	
-	float z = texture3D(u_texture, coord + vec3(0.0, 0.0, h)).x - texture3D(u_texture, coord - vec3(0.0, 0.0, h)).x;
-	vec3 gradient = vec3(x,y,z)/(2.0*h);
-	return -gradient;
+
+	float x = texture3D(u_texture, coord + vec3(h/2, 0.0, 0.0)).x - texture3D(u_texture, coord - vec3(h/2, 0.0, 0.0)).x;
+	float y = texture3D(u_texture, coord + vec3(0.0, h/2, 0.0)).x - texture3D(u_texture, coord - vec3(0.0, h/2, 0.0)).x;	
+	float z = texture3D(u_texture, coord + vec3(0.0, 0.0, h/2)).x - texture3D(u_texture, coord - vec3(0.0, 0.0, h/2)).x;
+	vec3 gradient = -vec3(x,y,z)/(2*h);
+	return gradient;
 }
 float isInside(){
-	float result =  u_clipping.x * samplePos.x + u_clipping.y * samplePos.y + u_clipping.z * samplePos.y + u_clipping.a ;
+	float result =  dot(u_clipping,vec4(samplePos,1));
 	return result;
 }
 void main(){
@@ -62,17 +63,18 @@ void main(){
 	noise = texture2D(u_noise, noise_coord).x;
 
 	if (u_is_jittering == 1)
-		samplePos += noise  * step_vector ;
-	L =  u_light_dir * model_local;
-	NdotL = 1;  
+		samplePos += noise * step_vector;
+	
+	L =  normalize(u_light_dir); 
+
 	// Ray loop
 	for(int i=0; i<MAX_ITERATIONS; i++)
 	{
 		// 2. Volume sampling
-		coord = (samplePos+1)/2; // Ahora va de 0 a 1
+		coord = (samplePos+1)/2; // Ahora va de 0 a 1, text coord
 		d = texture3D(u_texture,coord).x;
+		
 		// 3. Classification
-		vec4 sampleColor ;
 		if(u_is_tf == 1){
 			if (d<u_density1) 
 				sampleColor=vec4(1,0,0,d*u_alpha);
@@ -88,30 +90,27 @@ void main(){
 		sampleColor.rgb *= sampleColor.a;
 
 		// 4. Composition
-		
-
+		if(u_is_iso == 1)
+		{
+			if(d > u_threshold){
+				normal = normalize(gradient(coord));
+				NdotL = dot(normal,L); 
+				colorFinal.rgb += vec3(NdotL);
+				colorFinal.a = 1;
+			}
+			
+		}
 		if(u_is_clip == 1)
 		{
-			if(isInside()<=0) // si el punto se encuentra dentro del plano lo pintamos, si no se encuentra no lo pintamos
-				colorFinal += u_rayStep * (1.0 - colorFinal.a) * sampleColor ;
+			if(isInside()<0) // si el punto se encuentra dentro del plano lo pintamos, si no se encuentra no lo pintamos
+				colorFinal += u_rayStep * (1.0 - colorFinal.a) * sampleColor;
+			else
+				discard;
 		}	
 		else
 			colorFinal += u_rayStep* (1.0 - colorFinal.a) * sampleColor;
 		
-		if(u_is_iso == 1)
-		{
-			if(d >= u_threshold){
-				normal =normalize(gradient(coord));
-				NdotL = dot(normal,L); 
-				colorFinal += NdotL* (1-colorFinal.a);
-				colorFinal.a = 1;
-
-			}
-			
-		}
-		if(u_is_tf ==1 ){
-			
-		}
+		
 		// 5. Next sample
 		samplePos += step_vector;
 

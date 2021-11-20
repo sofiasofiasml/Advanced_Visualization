@@ -6,7 +6,7 @@
 class volumematerial : public StandardMaterial
 {
 public:
-	enum images { FOOT, TEAPOT, BONSAI};
+	enum images { ABDOMEN, TEAPOT, BONSAI, ORANGE, DAISY};
 	images eImages;
 
 
@@ -14,10 +14,16 @@ public:
 	Volume* volumeFoot;
 	Volume* volumeBonsai;
 	Volume* volumeTea;
+	Volume* volumeAbd;
+	Volume* volumeDaisy;
+	Volume* volumeOrg;
 
 	Texture* textureFoot;
 	Texture* textureBonsai;
 	Texture* textureTea;
+	Texture* textureAbd;
+	Texture* textureDaisy;
+	Texture* textureOrg;
 	Texture* noise;
 
 	Shader* shader;
