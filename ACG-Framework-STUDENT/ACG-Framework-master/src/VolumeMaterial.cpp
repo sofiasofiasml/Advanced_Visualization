@@ -5,6 +5,7 @@ volumematerial::volumematerial()
 	this->shader  = Shader::Get("data/shaders/basic.vs", "data/shaders/volume_skeleton.fs");
 	this->mesh = new Mesh();
 	this->mesh->createCube();
+
 	this->textureFoot = new Texture();
 	this->textureBonsai = new Texture();
 	this->textureTea = new Texture();
@@ -12,8 +13,16 @@ volumematerial::volumematerial()
 	this->textureDaisy = new Texture();
 	this->textureOrg = new Texture();
 	this->noise = new Texture;
-	this->noise = Texture::Get("data/blueNoise.png");
 	this->texture = new Texture();
+	this->noise = Texture::Get("data/blueNoise.png");
+
+	this->volumeFoot = new Volume();
+	this->volumeBonsai = new Volume();
+	this->volumeTea = new Volume();
+	this->volumeAbd = new Volume();
+	this->volumeDaisy = new Volume();
+	this->volumeOrg = new Volume();
+
 	this->is_tf = 0;
 	this->alpha = 1;
 	this->is_iso = 0;
@@ -23,31 +32,14 @@ volumematerial::volumematerial()
 	this->density3 = 1;
 	this->threshold = 0.01;
 	this->is_clipping = 0;
-	this->clip = vec4(0,0,0,0);
+	this->clip = vec4(0,0,0.1,0);
 	this->is_jittering = 0;
-	this->volumeFoot = new Volume();
-	this->volumeBonsai = new Volume();
-	this->volumeTea = new Volume();
-	this->volumeAbd = new Volume();
-	this->volumeDaisy = new Volume();
-	this->volumeOrg = new Volume();
 	this->rayStep = 0.02;
 	this->brightness = 2;
+
 	this->loadVolumeImg();
 	this->eImages = this->ABDOMEN;
 	this->texture = this->textureAbd;
-}
-
-
-void volumematerial::SetUniforms(Camera* camera, Matrix44 model)
-{
-	this->shader->setUniform("u_camera_position", camera->eye);
-	this->shader->setUniform("u_model", model);
-	this->shader->setUniform("u_rayStep", this->rayStep);
-
-	if ( this->texture)
-		this->shader->setUniform("u_texture", this->texture, 0);
-
 }
 
 
@@ -75,9 +67,9 @@ void volumematerial::renderInMenu()
 	ImGui::Combo("Output", (int*)&this->eImages, "ABDOMEN\0TEAPOT\0BONSAI\0ORANGE\0DAISY\0");
 	ImGui::Checkbox("Jittering", (bool*)&this->is_jittering);
 	ImGui::Checkbox("Clipping", (bool*)&this->is_clipping);
-	if(is_tf != 1)
+	//if(is_tf != 1)
 		ImGui::Checkbox("Isosurfaces", (bool*)&this->is_iso);
-	if(is_iso != 1)
+	//if(is_iso != 1)
 		ImGui::Checkbox("Transfer function", (bool*)&this->is_tf);
 
 	if (this->is_clipping == 1)

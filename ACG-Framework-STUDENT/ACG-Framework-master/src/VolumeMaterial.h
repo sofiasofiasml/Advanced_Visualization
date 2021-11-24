@@ -24,29 +24,32 @@ public:
 	Texture* textureAbd;
 	Texture* textureDaisy;
 	Texture* textureOrg;
-	Texture* noise;
 
 	Shader* shader;
 	float rayStep;
 	int brightness;
+
 	//Jittering
 	int is_jittering;
+	Texture* noise;
+
 	//Transfer function
 	int is_tf;
 	float alpha;
 	float density1;
 	float density2;
 	float density3;
+
 	//Clipping
 	int is_clipping;
 	vec4 clip;
+
 	//Isosurfaces
 	int is_iso;
 	float h; 
 	float threshold;
-	volumematerial();
 
-	void SetUniforms(Camera* camera, Matrix44 model);
+	volumematerial();
 	void loadVolumeImg();
 	void renderInMenu();
 };

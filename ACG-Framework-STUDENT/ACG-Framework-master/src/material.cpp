@@ -90,8 +90,6 @@ void StandardMaterial::setUniforms(Camera* camera, Matrix44 model)
 		
 	shader->setUniform("u_emissive", yourPbr->emissive_tex, 14);
 
-	
-
 	shader->setUniform("u_texAlbedo", yourPbr->tex_albedo[yourMat->eTexture], 1);
 	shader->setUniform("u_texMetal", yourPbr->tex_metal[yourMat->eTexture], 2);
 	shader->setUniform("u_texNormal", yourPbr->tex_normal[yourMat->eTexture], 3);

@@ -1,26 +1,28 @@
 #define MAX_ITERATIONS 10000000
 
-uniform mat4 u_model;
-varying vec3 v_position;
-uniform vec4 u_color;
-uniform vec4 u_color_factor;
-uniform vec3 u_camera_position;
 uniform sampler3D u_texture;
-uniform float u_rayStep;
+uniform sampler2D u_noise;
+uniform mat4 u_model;
+uniform vec4 u_color;
+uniform vec4 u_clipping;
+uniform vec4 u_color_factor;
+varying vec3 v_position;
+uniform vec3 u_light_color;
+uniform vec3 u_camera_position;
+uniform vec3 u_light_dir; 
+uniform int u_is_iso;
 uniform int u_brightness;
 uniform int u_is_jittering;
 uniform int u_is_tf;
-uniform sampler2D u_noise;
 uniform int u_is_clip;
-uniform vec4 u_clipping;
-uniform int u_is_iso;
+uniform float u_threshold; 
+uniform float u_rayStep;
 uniform float u_alpha;
 uniform float h; 
-uniform float u_threshold; 
-uniform vec3 u_light_dir; 
 uniform float u_density1;
 uniform float u_density2;
 uniform float u_density3;
+uniform float u_light_intensity;
 
 vec4 colorFinal;
 vec3 rayDir;
@@ -32,7 +34,7 @@ float d;
 float noise;
 vec3 normal; 
 vec3 L; 
-vec4 sampleColor ;
+vec4 sampleColor;
 float NdotL;
 
 vec3 gradient(vec3 coord){
@@ -78,11 +80,11 @@ void main(){
 		// 3. Classification
 		if(u_is_tf == 1){
 			if (d<u_density1) 
-				sampleColor=vec4(1,0,0,d*u_alpha);
+				sampleColor=vec4(0,1,0,d*u_alpha);
 			else if (d<u_density2) 
-				sampleColor=vec4(0,1,0,d);
-			else if (d<u_density3) 
 				sampleColor=vec4(1,1,0,d);
+			else if (d<u_density3) 
+				sampleColor=vec4(0,0,1,d);
 			else 
 				sampleColor = vec4(1,1,1,d);
 		}
@@ -96,15 +98,15 @@ void main(){
 		{
 			if(d > u_threshold){
 				normal = normalize(gradient(coord));
-				NdotL = dot(normal,L); 
-				colorFinal.rgb += vec3(NdotL);
+				NdotL = dot(normal,L)*u_light_intensity; 
+				colorFinal.rgb += vec3(NdotL)*u_light_color*sampleColor.rgb;
 				colorFinal.a = 1;
 			}
 			
 		}
 		if(u_is_clip == 1)
 		{
-			if(isInside()<=0) // si el punto se encuentra dentro del plano lo pintamos, si no se encuentra no lo pintamos
+			if(isInside()<0) // si el punto se encuentra dentro del plano lo pintamos, si no se encuentra no lo pintamos
 				colorFinal += u_rayStep * (1.0 - colorFinal.a) * sampleColor;
 			else
 				discard;
