@@ -1,4 +1,4 @@
-#define MAX_ITERATIONS 500
+#define MAX_ITERATIONS 10000000
 
 uniform mat4 u_model;
 varying vec3 v_position;
@@ -20,6 +20,7 @@ uniform float u_threshold;
 uniform vec3 u_light_dir; 
 uniform float u_density1;
 uniform float u_density2;
+uniform float u_density3;
 
 vec4 colorFinal;
 vec3 rayDir;
@@ -43,7 +44,7 @@ vec3 gradient(vec3 coord){
 	return gradient;
 }
 float isInside(){
-	float result =  dot(u_clipping,vec4(samplePos,1));
+	float result =  u_clipping.x * samplePos.x + u_clipping.y * samplePos.y + u_clipping.z * samplePos.y + u_clipping.a ;
 	return result;
 }
 void main(){
@@ -80,10 +81,11 @@ void main(){
 				sampleColor=vec4(1,0,0,d*u_alpha);
 			else if (d<u_density2) 
 				sampleColor=vec4(0,1,0,d);
+			else if (d<u_density3) 
+				sampleColor=vec4(1,1,0,d);
 			else 
 				sampleColor = vec4(1,1,1,d);
-			}
-			
+		}
 		else {
 			sampleColor = vec4(d,d,d,d);
 		}
@@ -102,7 +104,7 @@ void main(){
 		}
 		if(u_is_clip == 1)
 		{
-			if(isInside()<0) // si el punto se encuentra dentro del plano lo pintamos, si no se encuentra no lo pintamos
+			if(isInside()<=0) // si el punto se encuentra dentro del plano lo pintamos, si no se encuentra no lo pintamos
 				colorFinal += u_rayStep * (1.0 - colorFinal.a) * sampleColor;
 			else
 				discard;
@@ -120,6 +122,6 @@ void main(){
 		
 	}
 	//7. Final color 
-	colorFinal*= u_color_factor * u_brightness;
+	colorFinal*= u_color_factor *u_brightness;
 	gl_FragColor = vec4(colorFinal.rgb,1.0);  
 }

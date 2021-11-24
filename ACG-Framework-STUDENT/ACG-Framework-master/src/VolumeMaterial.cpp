@@ -18,8 +18,9 @@ volumematerial::volumematerial()
 	this->alpha = 1;
 	this->is_iso = 0;
 	this->h = 0.03; 
-	this->density1 = 0.5;
-	this->density2 = 1;
+	this->density1 = 0.25;
+	this->density2 = 0.5;
+	this->density3 = 1;
 	this->threshold = 0.01;
 	this->is_clipping = 0;
 	this->clip = vec4(0,0,0,0);
@@ -31,7 +32,7 @@ volumematerial::volumematerial()
 	this->volumeDaisy = new Volume();
 	this->volumeOrg = new Volume();
 	this->rayStep = 0.02;
-	this->brightness = 1;
+	this->brightness = 2;
 	this->loadVolumeImg();
 	this->eImages = this->ABDOMEN;
 	this->texture = this->textureAbd;
@@ -80,11 +81,12 @@ void volumematerial::renderInMenu()
 		ImGui::Checkbox("Transfer function", (bool*)&this->is_tf);
 
 	if (this->is_clipping == 1)
-		ImGui::DragFloat4("Clipping vector", &this->clip.x, 0.1f, -1, 1);
+		ImGui::DragFloat4("Clipping vector", &this->clip.x, 0.001f, -1, 1);
 	if(this->is_tf == 1){
 		ImGui::DragFloat("Alpha", &this->alpha, 0.01, 0, 1);
 		ImGui::DragFloat("Density 1", &this->density1, 0.01, -5, 1);
 		ImGui::DragFloat("Density 2", &this->density2, 0.01, -5, 1);
+		ImGui::DragFloat("Density 3", &this->density3, 0.01, -5, 1);
 	}
 		
 	if (this->is_iso == 1){

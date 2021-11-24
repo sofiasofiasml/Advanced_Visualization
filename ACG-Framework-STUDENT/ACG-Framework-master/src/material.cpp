@@ -73,6 +73,7 @@ void StandardMaterial::setUniforms(Camera* camera, Matrix44 model)
 	this->shader->setUniform("u_threshold", volumeMat->threshold);
 	this->shader->setUniform("u_density1", volumeMat->density1);
 	this->shader->setUniform("u_density2", volumeMat->density2);
+	this->shader->setUniform("u_density3", volumeMat->density3);
 	if(yourMat->eMaterial == yourMat->VOLUME)
 		this->shader->setUniform("u_alpha", volumeMat->alpha);
 

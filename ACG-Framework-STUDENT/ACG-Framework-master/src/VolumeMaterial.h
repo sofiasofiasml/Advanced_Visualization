@@ -36,6 +36,7 @@ public:
 	float alpha;
 	float density1;
 	float density2;
+	float density3;
 	//Clipping
 	int is_clipping;
 	vec4 clip;
