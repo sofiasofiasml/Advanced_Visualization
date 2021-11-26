@@ -23,6 +23,7 @@ uniform float u_density1;
 uniform float u_density2;
 uniform float u_density3;
 uniform float u_light_intensity;
+uniform int u_show_normals;
 
 vec4 colorFinal;
 vec3 rayDir;
@@ -94,27 +95,21 @@ void main(){
 		sampleColor.rgb *= sampleColor.a;
 
 		// 4. Composition
-		if(u_is_iso == 1)
-		{
-			if(d > u_threshold){
-				normal = normalize(gradient(coord));
-				NdotL = dot(normal,L)*u_light_intensity; 
-				colorFinal.rgb += vec3(NdotL)*u_light_color*sampleColor.rgb;
-				colorFinal.a = 1;
+		if(isInside()<0){
+			if(u_is_iso == 1)
+			{
+				if(d > u_threshold){
+					normal = normalize(gradient(coord));
+					NdotL = dot(normal,L)*u_light_intensity; 
+					sampleColor.rgb += NdotL *u_light_color;
+					colorFinal = sampleColor;
+					if(u_show_normals == 1)
+						colorFinal = vec4(normal,1.0);
+					colorFinal.a = 1;
+				}
 			}
-			
 		}
-		if(u_is_clip == 1)
-		{
-			if(isInside()<0) // si el punto se encuentra dentro del plano lo pintamos, si no se encuentra no lo pintamos
-				colorFinal += u_rayStep * (1.0 - colorFinal.a) * sampleColor;
-			else
-				discard;
-		}	
-		else
-			colorFinal += u_rayStep* (1.0 - colorFinal.a) * sampleColor;
-		
-		
+	
 		// 5. Next sample
 		samplePos += step_vector;
 

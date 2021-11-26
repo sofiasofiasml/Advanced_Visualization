@@ -31,11 +31,11 @@ volumematerial::volumematerial()
 	this->density2 = 0.5;
 	this->density3 = 1;
 	this->threshold = 0.01;
-	this->is_clipping = 0;
 	this->clip = vec4(0,0,0.1,0);
 	this->is_jittering = 0;
 	this->rayStep = 0.02;
 	this->brightness = 2;
+	this->show_normal = 0;
 
 	this->loadVolumeImg();
 	this->eImages = this->ABDOMEN;
@@ -66,14 +66,10 @@ void volumematerial::renderInMenu()
 	ImGui::DragFloat("step vector", &this->rayStep, 0.01, 0, 1);
 	ImGui::Combo("Output", (int*)&this->eImages, "ABDOMEN\0TEAPOT\0BONSAI\0ORANGE\0DAISY\0");
 	ImGui::Checkbox("Jittering", (bool*)&this->is_jittering);
-	ImGui::Checkbox("Clipping", (bool*)&this->is_clipping);
-	//if(is_tf != 1)
-		ImGui::Checkbox("Isosurfaces", (bool*)&this->is_iso);
-	//if(is_iso != 1)
-		ImGui::Checkbox("Transfer function", (bool*)&this->is_tf);
+	ImGui::Checkbox("Isosurfaces", (bool*)&this->is_iso);
+	ImGui::Checkbox("Transfer function", (bool*)&this->is_tf);
 
-	if (this->is_clipping == 1)
-		ImGui::DragFloat4("Clipping vector", &this->clip.x, 0.001f, -1, 1);
+	ImGui::DragFloat4("Clipping vector", &this->clip.x, 0.001f, -1, 1);
 	if(this->is_tf == 1){
 		ImGui::DragFloat("Alpha", &this->alpha, 0.01, 0, 1);
 		ImGui::DragFloat("Density 1", &this->density1, 0.01, -5, 1);
@@ -84,6 +80,8 @@ void volumematerial::renderInMenu()
 	if (this->is_iso == 1){
 		ImGui::DragFloat("H", &this->h, 0.01, 0.01, 1);
 		ImGui::DragFloat("Threshold", &this->threshold, 0.01, 0.01, 1);
+		ImGui::Checkbox("Show normals", (bool*)&this->show_normal);
+
 	}
 		
 	if (this->eImages == 0)

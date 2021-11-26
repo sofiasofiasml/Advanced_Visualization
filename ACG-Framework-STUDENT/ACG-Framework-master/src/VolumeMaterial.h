@@ -41,14 +41,13 @@ public:
 	float density3;
 
 	//Clipping
-	int is_clipping;
 	vec4 clip;
 
 	//Isosurfaces
 	int is_iso;
 	float h; 
 	float threshold;
-
+	int show_normal;
 	volumematerial();
 	void loadVolumeImg();
 	void renderInMenu();
