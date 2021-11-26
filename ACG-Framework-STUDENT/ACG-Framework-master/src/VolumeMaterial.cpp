@@ -63,7 +63,7 @@ void volumematerial::loadVolumeImg()
 void volumematerial::renderInMenu()
 {
 	ImGui::DragInt("brightness", &this->brightness, 1, 0, 100);
-	ImGui::DragFloat("step vector", &this->rayStep, 0.01, 0, 1);
+	ImGui::DragFloat("step vector", &this->rayStep, 0.01, 0.01, 1);
 	ImGui::Combo("Output", (int*)&this->eImages, "ABDOMEN\0TEAPOT\0BONSAI\0ORANGE\0DAISY\0");
 	ImGui::Checkbox("Jittering", (bool*)&this->is_jittering);
 	ImGui::Checkbox("Isosurfaces", (bool*)&this->is_iso);
