@@ -26,20 +26,20 @@ volumematerial::volumematerial()
 	this->is_tf = 0;
 	this->alpha = 1;
 	this->is_iso = 0;
-	this->h = 0.03; 
+	this->h = 0.01; 
 	this->density1 = 0.25;
 	this->density2 = 0.5;
 	this->density3 = 1;
-	this->threshold = 0.01;
-	this->clip = vec4(0,0,0.1,0);
+	this->threshold = 0.1;
+	this->clip = vec4(0,0,0.1,-0.7);
 	this->is_jittering = 0;
-	this->rayStep = 0.02;
+	this->rayStep = 0.01;
 	this->brightness = 2;
 	this->show_normal = 0;
 
 	this->loadVolumeImg();
-	this->eImages = this->ABDOMEN;
-	this->texture = this->textureAbd;
+	this->eImages = this->TEAPOT;
+	this->texture = this->textureTea;
 }
 
 

@@ -14,7 +14,6 @@ uniform int u_is_iso;
 uniform int u_brightness;
 uniform int u_is_jittering;
 uniform int u_is_tf;
-uniform int u_is_clip;
 uniform float u_threshold; 
 uniform float u_rayStep;
 uniform float u_alpha;
@@ -40,9 +39,9 @@ float NdotL;
 
 vec3 gradient(vec3 coord){
 
-	float x = texture3D(u_texture, coord + vec3(h/2, 0.0, 0.0)).x - texture3D(u_texture, coord - vec3(h/2, 0.0, 0.0)).x;
-	float y = texture3D(u_texture, coord + vec3(0.0, h/2, 0.0)).x - texture3D(u_texture, coord - vec3(0.0, h/2, 0.0)).x;	
-	float z = texture3D(u_texture, coord + vec3(0.0, 0.0, h/2)).x - texture3D(u_texture, coord - vec3(0.0, 0.0, h/2)).x;
+	float x = texture3D(u_texture, coord + vec3(h, 0.0, 0.0)).x - texture3D(u_texture, coord - vec3(h, 0.0, 0.0)).x;
+	float y = texture3D(u_texture, coord + vec3(0.0, h, 0.0)).x - texture3D(u_texture, coord - vec3(0.0, h, 0.0)).x;	
+	float z = texture3D(u_texture, coord + vec3(0.0, 0.0, h)).x - texture3D(u_texture, coord - vec3(0.0, 0.0, h)).x;
 	vec3 gradient = -vec3(x,y,z)/(2*h);
 	return gradient;
 }
@@ -83,7 +82,7 @@ void main(){
 			if (d<u_density1) 
 				sampleColor=vec4(0,1,0,d*u_alpha);
 			else if (d<u_density2) 
-				sampleColor=vec4(1,1,0,d);
+				sampleColor=vec4(1,1,0,d*u_alpha);
 			else if (d<u_density3) 
 				sampleColor=vec4(0,0,1,d);
 			else 
@@ -93,7 +92,8 @@ void main(){
 			sampleColor = vec4(d,d,d,d);
 		}
 		sampleColor.rgb *= sampleColor.a;
-
+		if(u_is_iso != 1)
+			colorFinal +=  u_rayStep * (1.0 - colorFinal.a) * sampleColor;
 		// 4. Composition
 		if(isInside()<0){
 			if(u_is_iso == 1)
